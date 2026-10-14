@@ -151,7 +151,7 @@ function revealCell(idx) {
 function checkWin() {
     const revealedCount = cells.filter(c => c.classList.contains('revealed')).length;
     if (revealedCount === SIZE * SIZE - MINES_COUNT) {
-        statusEl.textContent = '🌿 ¡Victoria limpia! Despejaste todo el campo.';
+        statusEl.textContent = ' ¡Victoria! Despejaste todo el campo.';
         gameOver = true;
     }
 }

@@ -25,9 +25,9 @@ def manifest():
 def webhook():
     if request.method == 'POST':
         try:
-            # 1. Hace git pull en tu carpeta de PythonAnywhere
-            subprocess.run(['git', '-C', REPO_PATH, 'pull', 'origin', 'main'], check=True)
-            # 2. Toca el archivo WSGI para que PythonAnywhere recargue la web sola
+            # Descarga de GitHub y fuerza la sincronización exacta sin trabarse por archivos sueltos
+            subprocess.run(['git', '-C', REPO_PATH, 'fetch', '--all'], check=True)
+            subprocess.run(['git', '-C', REPO_PATH, 'reset', '--hard', 'origin/main'], check=True)
             if os.path.exists(WSGI_FILE):
                 os.utime(WSGI_FILE, None)
             return 'Servidor actualizado y recargado con éxito 🚀', 200
