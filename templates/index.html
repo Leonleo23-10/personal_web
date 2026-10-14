@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="cream">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Digital & Arcade</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2D5A3C">
+    <!-- Tipografías limpias y técnicas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="logo">
+            <span class="status-dot"></span>
+            <span>LAB // PORTAFOLIO</span>
+        </div>
+        <button id="theme-toggle" class="btn-pill" aria-label="Cambiar tema">
+            🌿 Modo Bosque / Crema
+        </button>
+    </header>
+
+    <main class="bento-grid" id="bento-grid">
+
+        <!-- CAJA 1: HERO / PRESENTACIÓN (2x2) -->
+        <article class="bento-card span-2x2 hero-card" data-tilt>
+            <div class="card-content">
+                <span class="badge">Full-Stack Dev & Física</span>
+                <h1>Construyendo software sólido, interfaces vivas y experimentos sin anuncios.</h1>
+                <p>Bienvenido a mi jardín digital. Aquí documento arquitecturas web que he puesto en producción, simulaciones físicas interactivas y mi colección personal de juegos clásicos listos para jugar offline.</p>
+                <div class="hero-actions">
+                    <a href="#proyectos" class="btn-primary">Ver Proyectos</a>
+                    <button id="install-pwa" class="btn-secondary" style="display: none;">📲 Instalar App Offline</button>
+                </div>
+            </div>
+        </article>
+
+        <!-- CAJA 2: ARCADE SIN ANUNCIOS - MINI BUSCAMINAS EN VIVO (2x1) -->
+        <article class="bento-card span-2x1 arcade-card" data-tilt>
+            <div class="card-content arcade-layout">
+                <div class="arcade-info">
+                    <span class="badge badge-outline">Arcade 100% Offline</span>
+                    <h2>Buscaminas Libre</h2>
+                    <p>Cero anuncios, táctil y portable. Pruébalo aquí mismo o abre la versión completa.</p>
+                    <div class="arcade-controls">
+                        <button id="mode-toggle" class="btn-mini active-dig">⛏️ Cavar</button>
+                        <button id="reset-mines" class="btn-mini">🔄 Reiniciar</button>
+                    </div>
+                </div>
+                <!-- Mini tablero 4x4 interactivo directo en el Bento -->
+                <div class="mini-minesweeper" id="mini-board"></div>
+            </div>
+        </article>
+
+        <!-- CAJA 3: PROYECTOS FULL-STACK (1x2 Vertical) -->
+        <article class="bento-card span-1x2 projects-card" id="proyectos" data-tilt>
+            <div class="card-content">
+                <span class="badge">Arquitectura & Código</span>
+                <h2>Proyectos en Producción</h2>
+                <div class="project-list">
+                    <div class="project-item">
+                        <h3>Plataforma de Gestión & Clases</h3>
+                        <p>Sistema integral con horarios, generación automática de recibos, módulos en video y administración de usuarios.</p>
+                        <div class="tags"><span>Python</span><span>Flask</span><span>SQL</span></div>
+                    </div>
+                    <div class="project-item">
+                        <h3>Marketplace con Pagos Divididos</h3>
+                        <p>Arquitectura de compra/venta e integración de flujos de pago complejos con Stripe Connect.</p>
+                        <div class="tags"><span>Stripe API</span><span>JS</span><span>PostgreSQL</span></div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- CAJA 4: SANDBOX DE FÍSICA INTERACTIVA (1x1) -->
+        <article class="bento-card span-1x1 canvas-card" data-tilt>
+            <canvas id="gravity-canvas"></canvas>
+            <div class="card-overlay">
+                <span class="badge">Sandbox</span>
+                <h3>Órbita Gravitacional</h3>
+                <small>Mueve el cursor para alterar el campo</small>
+            </div>
+        </article>
+
+        <!-- CAJA 5: ESTADO ACTUAL / NOW (2x1) -->
+        <article class="bento-card span-2x1 now-card" data-tilt>
+            <div class="card-content">
+                <span class="badge">📍 /now — En qué estoy enfocado</span>
+                <div class="now-grid">
+                    <div>
+                        <strong>Estudiando</strong>
+                        <p>Física teórica, ecuaciones diferenciales y métodos numéricos.</p>
+                    </div>
+                    <div>
+                        <strong>Desarrollando</strong>
+                        <p>Colección de juegos clásicos web sin anuncios con soporte PWA.</p>
+                    </div>
+                    <div>
+                        <strong>Entrenando</strong>
+                        <p>Fuerza en el gimnasio e inglés conversacional.</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

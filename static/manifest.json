@@ -1,0 +1,8 @@
+{
+  "name": "Leonardo Lab & Arcade",
+  "short_name": "LeoLab",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F4EB",
+  "theme_color": "#2D5A3C"
+}
