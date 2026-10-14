@@ -50,7 +50,7 @@ GAMES = {
         'number': '02',
         'title': 'Sudoku Minimalista',
         'short_name': 'Sudoku',
-        'status': 'EN DESARROLLO',
+        'status': 'DISPONIBLE',
         'description': 'Tableros generados matemáticamente con solución única, modo de anotaciones por casilla y guardado automático en memoria local.',
         'svg_path': '<path d="M140 215h232M140 297h232M215 140v232M297 140v232" stroke="#dad7cd" stroke-width="20" stroke-linecap="round"/>'
     },
@@ -58,7 +58,7 @@ GAMES = {
         'number': '03',
         'title': 'Solitario Klondike',
         'short_name': 'Solitario',
-        'status': 'EN DESARROLLO',
+        'status': 'DISPONIBLE',
         'description': 'Baraja vectorial de alto contraste con arrastre fluido, autocompletado inteligente al despejar columnas y cero cortes publicitarios.',
         'svg_path': '<rect x="175" y="135" width="162" height="242" rx="22" fill="#588157" stroke="#dad7cd" stroke-width="20"/><circle cx="256" cy="256" r="34" fill="#dad7cd"/>'
     },
@@ -66,7 +66,7 @@ GAMES = {
         'number': '04',
         'title': 'Tetris Clásico',
         'short_name': 'Tetris',
-        'status': 'EN DESARROLLO',
+        'status': 'DISPONIBLE',
         'description': 'Motor de caída de tetrominós con pieza fantasma de guía, retención de ficha (hold), controles táctiles precisos y tabla de récords.',
         'svg_path': '<path d="M160 220h192v64H160zM224 156h64v64h-64z" fill="#588157" stroke="#dad7cd" stroke-width="18" stroke-linejoin="round"/>'
     },
@@ -74,7 +74,7 @@ GAMES = {
         'number': '05',
         'title': '2048 Botánico',
         'short_name': '2048',
-        'status': 'EN DESARROLLO',
+        'status': 'DISPONIBLE',
         'description': 'Rompecabezas numérico de deslizamiento sobre matriz 4x4 con transiciones suaves en CSS, botón de deshacer movimiento y guardado de sesión.',
         'svg_path': '<rect x="150" y="150" width="95" height="95" rx="16" fill="#588157" stroke="#dad7cd" stroke-width="16"/><rect x="267" y="267" width="95" height="95" rx="16" fill="#a3b18a" stroke="#dad7cd" stroke-width="16"/>'
     },
@@ -82,7 +82,7 @@ GAMES = {
         'number': '06',
         'title': 'Snake Retro',
         'short_name': 'Snake',
-        'status': 'EN DESARROLLO',
+        'status': 'DISPONIBLE',
         'description': 'El clásico de Nokia reconstruido en lienzo limpio con velocidad progresiva, gestos de deslizamiento en móvil y modo sin bordes.',
         'svg_path': '<path d="M150 320h110V200h102" fill="none" stroke="#dad7cd" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/><circle cx="362" cy="145" r="18" fill="#a3b18a"/>'
     }
@@ -146,17 +146,18 @@ def game_manifest(game_id):
         ]
     })
 
+# En app.py, dentro de game_sw(game_id), actualiza la función así (con estrategia Network-First):
 @app.route('/arcade/<game_id>/sw.js')
 def game_sw(game_id):
-    """Genera un Service Worker exclusivo para guardar en caché offline el juego actual."""
     if game_id not in GAMES:
         abort(404)
     sw_code = f"""
-    const CACHE_NAME = 'pwa-game-{game_id}-v2';
+    const CACHE_NAME = 'pwa-game-{game_id}-v3';
     const URLS = [
         '/arcade/{game_id}/',
         '/static/css/style.css',
         '/static/js/main.js',
+        '/static/js/arcade_engines.js',
         '/arcade/{game_id}/manifest.json',
         '/arcade/{game_id}/icon.svg'
     ];
@@ -164,12 +165,21 @@ def game_sw(game_id):
         self.skipWaiting();
         e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(URLS)));
     }});
+    self.addEventListener('activate', e => {{
+        e.waitUntil(clients.claim());
+    }});
+    // Network-First: Si hay internet baja lo más nuevo; si estás offline usa la caché
     self.addEventListener('fetch', e => {{
-        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+        e.respondWith(
+            fetch(e.request).then(res => {{
+                const copy = res.clone();
+                caches.open(CACHE_NAME).then(c => c.put(e.request, copy));
+                return res;
+            }}).catch(() => caches.match(e.request))
+        );
     }});
     """
     return Response(sw_code, mimetype='application/javascript')
-
 @app.route('/arcade/<game_id>/icon.svg')
 def game_icon(game_id):
     """Renderiza el ícono vectorial de la aplicación usando el trazo definido en GAMES."""

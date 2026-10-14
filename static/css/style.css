@@ -773,3 +773,127 @@ body {
     font-weight: 600;
     border: 1px solid var(--dry-sage);
 }
+/* ==========================================================================
+   9. ESTILOS DE LOS MOTORES DEL ARCADE (SUDOKU, SOLITARIO, TETRIS, 2048, SNAKE)
+   ========================================================================== */
+.score-panel {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.arcade-canvas {
+    border-radius: 16px;
+    border: 2px solid var(--hunter-green);
+    box-shadow: 0 18px 35px -12px rgba(52, 78, 65, 0.35);
+}
+
+/* Sudoku */
+.sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(30px, 40px));
+    gap: 2px;
+    background: var(--pine-teal);
+    padding: 10px;
+    border-radius: 16px;
+}
+
+.sudoku-cell {
+    aspect-ratio: 1 / 1;
+    background: var(--dust-grey);
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--pine-teal);
+    cursor: pointer;
+}
+
+.sudoku-cell.fixed { background: var(--dry-sage); cursor: default; }
+.sudoku-cell.selected { outline: 2.5px solid var(--fern); background: #fff; }
+.sudoku-cell.border-right { margin-right: 4px; }
+.sudoku-cell.border-bottom { margin-bottom: 4px; }
+
+.sudoku-numpad {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+/* 2048 */
+.board-2048 {
+    display: grid;
+    grid-template-columns: repeat(4, 72px);
+    grid-template-rows: repeat(4, 72px);
+    gap: 8px;
+    background: var(--pine-teal);
+    padding: 12px;
+    border-radius: 18px;
+}
+
+.tile-2048 {
+    background: rgba(218, 215, 205, 0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--pine-teal);
+}
+
+.tile-2048.filled {
+    background: var(--dry-sage);
+}
+
+/* Solitario Klondike */
+.solitaire-table {
+    margin-top: 2rem;
+    background: var(--pine-teal);
+    padding: 1.8rem;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sol-top-row, .sol-cols-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.8rem;
+}
+
+.sol-slot {
+    min-height: 95px;
+    border: 1.5px dashed var(--dry-sage);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dry-sage);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sol-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.sol-card {
+    padding: 0.7rem 0.6rem;
+    border-radius: 8px;
+    font-weight: 700;
+    background: var(--dust-grey);
+    color: var(--pine-teal);
+    border: 1px solid var(--hunter-green);
+    cursor: pointer;
+    user-select: none;
+}
+
+.sol-card.red { color: #8c2d2a; }
+.sol-card.down { background: var(--hunter-green); color: var(--dry-sage); cursor: default; }
+.sol-card.selected { outline: 3px solid var(--dry-sage); transform: translateY(-3px); }
