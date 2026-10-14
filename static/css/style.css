@@ -774,126 +774,240 @@ body {
     border: 1px solid var(--dry-sage);
 }
 /* ==========================================================================
-   9. ESTILOS PRO DE LOS MOTORES DEL ARCADE (PC & MÓVIL)
+   9. ESCENARIO CENTRADO Y MAXIMIZADO DEL ARCADE (PC & MÓVIL)
    ========================================================================== */
-.score-panel {
-    display: flex;
-    gap: 1.5rem;
-    font-size: 0.95rem;
-    margin-bottom: 0.75rem;
-    background: var(--bg-secondary);
-    padding: 0.65rem 1.1rem;
-    border-radius: 12px;
-    border: 1px solid var(--border-line);
-    width: fit-content;
+.compact-nav {
+    padding: 1rem 4vw;
 }
 
+.hud-Right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.game-center-container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 1.2rem 3vw 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.game-hud-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-line);
+    padding: 0.75rem 1.1rem;
+    border-radius: 18px;
+}
+
+.hud-stats, .hud-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.stat-pill {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-line);
+    padding: 0.35rem 0.85rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+}
+
+.game-stage-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 62vh;
+}
+
+.game-gesture-hint {
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 56ch;
+}
+
+/* Modal superpuesto encima del tablero (Overlay de Victoria / Derrota) */
+.game-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(28, 42, 34, 0.78);
+    backdrop-filter: blur(6px);
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1.5rem;
+}
+
+.game-overlay[hidden] {
+    display: none !important;
+}
+
+.overlay-card {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 2px solid var(--dry-sage);
+    padding: 2.2rem 2rem;
+    border-radius: 22px;
+    text-align: center;
+    max-width: 360px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.overlay-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+}
+
+/* --- TABLEROS CENTRADOS DE GRAN FORMATO --- */
 .arcade-canvas, .board-2048, .minesweeper-board, .sudoku-board {
     touch-action: none;
     user-select: none;
-    max-width: 100%;
 }
 
 .arcade-canvas {
-    border-radius: 18px;
+    border-radius: 20px;
     border: 3px solid var(--pine-teal);
-    box-shadow: 0 20px 40px -15px rgba(52, 78, 65, 0.4);
+    box-shadow: 0 22px 45px -15px rgba(52, 78, 65, 0.45);
     background: #25392f;
+    max-width: 92vw;
+    height: auto;
 }
 
-/* --- SUDOKU --- */
+.minesweeper-board {
+    display: grid;
+    grid-template-columns: repeat(8, clamp(36px, 9.5vw, 52px));
+    gap: 6px;
+    background: var(--pine-teal);
+    padding: 16px;
+    border-radius: 22px;
+}
+
+/* --- SUDOKU + POPOVER FLOTANTE --- */
+.sudoku-stage-box {
+    position: relative;
+    display: inline-block;
+}
+
 .sudoku-board {
     display: grid;
-    grid-template-columns: repeat(9, minmax(30px, 44px));
+    grid-template-columns: repeat(9, clamp(32px, 9.2vw, 52px));
     gap: 2px;
     background: var(--pine-teal);
-    padding: 10px;
-    border-radius: 18px;
-    box-shadow: 0 18px 36px -14px rgba(52, 78, 65, 0.35);
+    padding: 12px;
+    border-radius: 20px;
+    box-shadow: 0 22px 44px -15px rgba(52, 78, 65, 0.4);
 }
 
 .sudoku-cell {
     aspect-ratio: 1 / 1;
     background: var(--dust-grey);
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     font-weight: 700;
-    font-size: clamp(0.9rem, 2.2vw, 1.15rem);
+    font-size: clamp(1rem, 2.8vw, 1.35rem);
     color: var(--pine-teal);
     cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-.sudoku-cell.fixed {
-    background: #c7c4b8;
-    color: var(--pine-teal);
-}
-
-.sudoku-cell.user-input {
-    color: var(--hunter-green);
-    font-weight: 800;
-}
-
-.sudoku-cell.axis-highlight {
-    background: #e5e2d7;
-}
-
-.sudoku-cell.same-num {
-    background: var(--dry-sage);
-    color: var(--pine-teal);
-}
-
+.sudoku-cell.fixed { background: #c5c2b6; }
+.sudoku-cell.user-input { color: var(--hunter-green); font-weight: 800; }
+.sudoku-cell.axis-highlight { background: #e5e2d7; }
+.sudoku-cell.same-num { background: var(--dry-sage); }
 .sudoku-cell.selected {
     background: var(--fern) !important;
     color: var(--dust-grey) !important;
-    transform: scale(1.05);
-    z-index: 2;
 }
-
 .sudoku-cell.error-cell {
     background: #b54845 !important;
     color: #fff !important;
 }
-
 .sudoku-cell.border-right { margin-right: 5px; }
 .sudoku-cell.border-bottom { margin-bottom: 5px; }
 
-.sudoku-numpad {
-    display: grid;
-    grid-template-columns: repeat(9, 1fr);
-    gap: 0.4rem;
-    max-width: 420px;
+.sudoku-popover {
+    position: absolute;
+    z-index: 40;
+    background: var(--pine-teal);
+    border: 2px solid var(--dry-sage);
+    padding: 8px;
+    border-radius: 16px;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.38);
+    width: 174px;
 }
 
-.sudoku-key {
-    aspect-ratio: 1 / 1;
-    border-radius: 10px;
-    border: 1px solid var(--hunter-green);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+.sudoku-popover[hidden] {
+    display: none !important;
+}
+
+.popover-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.popover-num-btn {
+    padding: 0.55rem 0;
+    border: none;
+    border-radius: 9px;
+    background: var(--dust-grey);
+    color: var(--pine-teal);
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 1.05rem;
+    font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.sudoku-key:hover, .sudoku-key:active {
+.popover-num-btn:hover, .popover-num-btn:active {
+    background: var(--fern);
+    color: var(--dust-grey);
+}
+
+.popover-num-btn.erase-key {
+    grid-column: span 3;
     background: var(--hunter-green);
     color: var(--dust-grey);
-    transform: translateY(-2px);
+    font-size: 0.82rem;
 }
 
-/* --- 2048 BOTÁNICO --- */
+/* --- 2048 MAXIMIZADO --- */
 .board-2048 {
     display: grid;
-    grid-template-columns: repeat(4, minmax(60px, 78px));
-    grid-template-rows: repeat(4, minmax(60px, 78px));
+    grid-template-columns: repeat(4, clamp(68px, 19vw, 96px));
+    grid-template-rows: repeat(4, clamp(68px, 19vw, 96px));
     gap: 10px;
     background: var(--pine-teal);
     padding: 14px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px -15px rgba(52, 78, 65, 0.35);
+    border-radius: 22px;
+    box-shadow: 0 22px 44px -15px rgba(52, 78, 65, 0.4);
 }
 
 .tile-2048 {
@@ -904,9 +1018,7 @@ body {
     justify-content: center;
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: clamp(1.1rem, 2.5vw, 1.45rem);
-    color: var(--pine-teal);
-    transition: transform 0.15s ease, background-color 0.2s ease;
+    font-size: clamp(1.25rem, 3.5vw, 1.75rem);
 }
 
 .tile-2048[data-val="2"]    { background: #dad7cd; color: #344e41; }
@@ -914,7 +1026,7 @@ body {
 .tile-2048[data-val="8"]    { background: #a3b18a; color: #1e2f26; }
 .tile-2048[data-val="16"]   { background: #7ea172; color: #dad7cd; }
 .tile-2048[data-val="32"]   { background: #588157; color: #dad7cd; }
-.tile-2048[data-val="64"]   { background: #3a5a40; color: #dad7cd; border: 1px solid #a3b18a; }
+.tile-2048[data-val="64"]   { background: #3a5a40; color: #dad7cd; }
 .tile-2048[data-val="128"],
 .tile-2048[data-val="256"],
 .tile-2048[data-val="512"],
@@ -922,31 +1034,30 @@ body {
 .tile-2048[data-val="2048"] {
     background: #dad7cd;
     color: #344e41;
-    box-shadow: 0 0 14px rgba(163, 177, 138, 0.6);
+    box-shadow: 0 0 14px rgba(163, 177, 138, 0.65);
 }
 
-/* --- SOLITARIO KLONDIKE --- */
+/* --- SOLITARIO CON DRAG & DROP --- */
 .solitaire-table {
-    margin-top: 1.5rem;
+    width: 100%;
     background: #25392f;
-    padding: clamp(0.8rem, 2.5vw, 1.8rem);
+    padding: clamp(0.6rem, 2vw, 1.5rem);
     border-radius: 22px;
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
-    overflow-x: auto;
+    gap: 1.4rem;
     box-shadow: 0 22px 44px -16px rgba(52, 78, 65, 0.45);
+    touch-action: none;
 }
 
 .sol-top-row, .sol-cols-row {
     display: grid;
-    grid-template-columns: repeat(7, minmax(46px, 1fr));
-    gap: clamp(0.35rem, 1.2vw, 0.85rem);
-    min-width: 340px;
+    grid-template-columns: repeat(7, minmax(38px, 1fr));
+    gap: clamp(0.25rem, 1vw, 0.75rem);
 }
 
 .sol-slot {
-    height: clamp(68px, 11vw, 96px);
+    height: clamp(64px, 13vw, 104px);
     border: 1.5px dashed rgba(163, 177, 138, 0.45);
     border-radius: 10px;
     display: flex;
@@ -954,61 +1065,37 @@ body {
     align-items: center;
     justify-content: center;
     color: var(--dry-sage);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
-    position: relative;
-}
-
-.sol-deck-count {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.1rem;
-    color: var(--dust-grey);
 }
 
 .sol-col {
     display: flex;
     flex-direction: column;
-    min-height: 260px;
+    min-height: 280px;
 }
 
 .sol-card {
-    height: clamp(68px, 11vw, 96px);
+    height: clamp(64px, 13vw, 104px);
     width: 100%;
-    padding: 0.4rem 0.5rem;
-    border-radius: 10px;
+    padding: 0.35rem 0.45rem;
+    border-radius: 9px;
     font-weight: 800;
     background: var(--dust-grey);
     color: var(--pine-teal);
     border: 1.5px solid var(--pine-teal);
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
-    cursor: pointer;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+    cursor: grab;
     user-select: none;
+    touch-action: none;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: relative;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.sol-card-corner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: clamp(0.75rem, 1.6vw, 0.92rem);
-    line-height: 1;
-}
-
-.sol-card-center {
-    align-self: center;
-    font-size: clamp(1.1rem, 2.4vw, 1.6rem);
-    opacity: 0.85;
-}
-
-.sol-card.red {
-    color: #9e3a37;
-}
-
+.sol-card:active { cursor: grabbing; }
+.sol-card.red { color: #9e3a37; }
 .sol-card.down {
     background: var(--hunter-green);
     color: var(--dry-sage);
@@ -1017,15 +1104,10 @@ body {
     justify-content: center;
 }
 
-.sol-card-back {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.75rem;
-    opacity: 0.7;
-}
-
-.sol-card.selected {
-    outline: 3px solid var(--fern);
-    background: #ffffff;
-    transform: translateY(-6px);
-    z-index: 10;
+.dragging-card-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: rotate(3deg) scale(1.06);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45) !important;
 }
