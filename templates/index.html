@@ -1,112 +1,143 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="cream">
+<html lang="es" data-mode="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laboratorio Digital & Arcade</title>
+    <title>Leonardo — Dev & Lab</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#2D5A3C">
-    <!-- Tipografías limpias y técnicas -->
+    <meta name="theme-color" content="#344e41">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-    <header class="top-bar">
-        <div class="logo">
-            <span class="status-dot"></span>
-            <span>LAB // PORTAFOLIO</span>
+    <!-- Cursor personalizado estilo Awwwards -->
+    <div class="custom-cursor" id="custom-cursor"></div>
+
+    <!-- Vista previa flotante que sigue al cursor en la lista de proyectos -->
+    <div class="floating-preview" id="floating-preview">
+        <span id="preview-tag">Arquitectura Full-Stack</span>
+    </div>
+
+    <!-- NAVEGACIÓN MINIMALISTA ESTILO BELLO. -->
+    <header class="nav-header">
+        <a href="#" class="brand">leo<span class="dot">.</span></a>
+        
+        <div class="mode-switch-wrapper">
+            <button class="mode-pill active" data-target="work">Proyectos</button>
+            <button class="mode-pill" data-target="arcade">Arcade Offline</button>
+            <button class="mode-pill" data-target="theme" id="theme-toggle" title="Invertir paleta">◐</button>
         </div>
-        <button id="theme-toggle" class="btn-pill" aria-label="Cambiar tema">
-            🌿 Modo Bosque / Crema
-        </button>
+
+        <a href="#contacto" class="nav-link magnetic">Disponible para proyectos ↗</a>
     </header>
 
-    <main class="bento-grid" id="bento-grid">
+    <main>
+        <!-- SECCIÓN 1: HERO EDITORIAL MONUMENTAL -->
+        <section class="hero-section">
+            <div class="hero-meta">
+                <span>DESARROLLADOR WEB & FÍSICA</span>
+                <span>CDMX // MÉXICO</span>
+            </div>
+            <h1 class="display-title">
+                CREANDO <span class="italic-accent">SOFTWARE</span> SÓLIDO, INTERFACES VIVAS <span class="amp">&</span> EXPERIMENTOS.
+            </h1>
+            <div class="hero-bottom">
+                <p class="hero-bio">
+                    Construyo aplicaciones web completas en Python, Flask y SQL, integrando pasarelas de pago y experiencias interactivas en CSS puro. Sin plantillas genéricas.
+                </p>
+                <div class="scroll-indicator">SCROLL ↓</div>
+            </div>
+        </section>
 
-        <!-- CAJA 1: HERO / PRESENTACIÓN (2x2) -->
-        <article class="bento-card span-2x2 hero-card" data-tilt>
-            <div class="card-content">
-                <span class="badge">Full-Stack Dev & Física</span>
-                <h1>Construyendo software sólido, interfaces vivas y experimentos sin anuncios.</h1>
-                <p>Bienvenido a mi jardín digital. Aquí documento arquitecturas web que he puesto en producción, simulaciones físicas interactivas y mi colección personal de juegos clásicos listos para jugar offline.</p>
-                <div class="hero-actions">
-                    <a href="#proyectos" class="btn-primary">Ver Proyectos</a>
-                    <button id="install-pwa" class="btn-secondary" style="display: none;">📲 Instalar App Offline</button>
+        <!-- SECCIÓN 2: SELECTED WORKS (FILAS INTERACTIVAS ESTILO MIJOBELLO) -->
+        <section class="works-section" id="proyectos">
+            <div class="section-header">
+                <span>01 // TRABAJOS SELECCIONADOS</span>
+                <span>(2025 — 2026)</span>
+            </div>
+
+            <div class="work-list">
+                <a href="#proyectos" class="work-row" data-preview="Flask · SQL · Recibos PDF · Video Módulos">
+                    <div class="work-left">
+                        <span class="work-index">01</span>
+                        <h2 class="work-title">Plataforma & Estudio Virtual</h2>
+                    </div>
+                    <div class="work-right">
+                        <span class="work-role">Full-Stack & Administración</span>
+                        <span class="work-arrow">↗</span>
+                    </div>
+                </a>
+
+                <a href="#proyectos" class="work-row" data-preview="Stripe Connect · Python · Pujas & Pagos">
+                    <div class="work-left">
+                        <span class="work-index">02</span>
+                        <h2 class="work-title">Bike Fit Marketplace</h2>
+                    </div>
+                    <div class="work-right">
+                        <span class="work-role">Arquitectura & Pagos</span>
+                        <span class="work-arrow">↗</span>
+                    </div>
+                </a>
+
+                <a href="#proyectos" class="work-row" data-preview="JavaScript · Interfaz Dinámica · 21 Mesas">
+                    <div class="work-left">
+                        <span class="work-index">03</span>
+                        <h2 class="work-title">Sistema Interactivo de Mesas</h2>
+                    </div>
+                    <div class="work-right">
+                        <span class="work-role">Frontend & Lógica en Vivo</span>
+                        <span class="work-arrow">↗</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: THE FUN / LAB SECTION (ARCADE OFFLINE + FÍSICA) -->
+        <section class="lab-section" id="arcade">
+            <div class="section-header">
+                <span>02 // LABORATORIO & ARCADE SIN ANUNCIOS</span>
+                <span>100% OFFLINE READY</span>
+            </div>
+
+            <div class="lab-showcase">
+                <!-- Columna Izquierda: Explicación y controles del Arcade -->
+                <div class="lab-description">
+                    <span class="pill-tag">Juega sin internet ni publicidad</span>
+                    <h2>Buscaminas Edición Botánica.</h2>
+                    <p>
+                        Me molestaba descargar juegos clásicos llenos de anuncios invasivos, así que programé mi propia colección optimizada para móvil y escritorio. Puedes jugarlo aquí mismo, instalar esta web como App offline o descargar el cartucho en un solo archivo.
+                    </p>
+
+                    <div class="game-toolbar">
+                        <button id="mode-toggle" class="btn-editorial active">⛏️ Modo Cavar</button>
+                        <button id="reset-mines" class="btn-editorial">🔄 Nuevo Tablero</button>
+                        <button id="download-game" class="btn-editorial btn-outline">⬇ Descargar .HTML Offline</button>
+                    </div>
+                    <p class="mine-status" id="mine-status">Minas ocultas: 10 · Primer clic siempre seguro.</p>
+                </div>
+
+                <!-- Columna Derecha: Tablero 8x8 real estilizado con tu paleta -->
+                <div class="board-container">
+                    <div class="minesweeper-board" id="minesweeper-board"></div>
                 </div>
             </div>
-        </article>
-
-        <!-- CAJA 2: ARCADE SIN ANUNCIOS - MINI BUSCAMINAS EN VIVO (2x1) -->
-        <article class="bento-card span-2x1 arcade-card" data-tilt>
-            <div class="card-content arcade-layout">
-                <div class="arcade-info">
-                    <span class="badge badge-outline">Arcade 100% Offline</span>
-                    <h2>Buscaminas Libre</h2>
-                    <p>Cero anuncios, táctil y portable. Pruébalo aquí mismo o abre la versión completa.</p>
-                    <div class="arcade-controls">
-                        <button id="mode-toggle" class="btn-mini active-dig">⛏️ Cavar</button>
-                        <button id="reset-mines" class="btn-mini">🔄 Reiniciar</button>
-                    </div>
-                </div>
-                <!-- Mini tablero 4x4 interactivo directo en el Bento -->
-                <div class="mini-minesweeper" id="mini-board"></div>
-            </div>
-        </article>
-
-        <!-- CAJA 3: PROYECTOS FULL-STACK (1x2 Vertical) -->
-        <article class="bento-card span-1x2 projects-card" id="proyectos" data-tilt>
-            <div class="card-content">
-                <span class="badge">Arquitectura & Código</span>
-                <h2>Proyectos en Producción</h2>
-                <div class="project-list">
-                    <div class="project-item">
-                        <h3>Plataforma de Gestión & Clases</h3>
-                        <p>Sistema integral con horarios, generación automática de recibos, módulos en video y administración de usuarios.</p>
-                        <div class="tags"><span>Python</span><span>Flask</span><span>SQL</span></div>
-                    </div>
-                    <div class="project-item">
-                        <h3>Marketplace con Pagos Divididos</h3>
-                        <p>Arquitectura de compra/venta e integración de flujos de pago complejos con Stripe Connect.</p>
-                        <div class="tags"><span>Stripe API</span><span>JS</span><span>PostgreSQL</span></div>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <!-- CAJA 4: SANDBOX DE FÍSICA INTERACTIVA (1x1) -->
-        <article class="bento-card span-1x1 canvas-card" data-tilt>
-            <canvas id="gravity-canvas"></canvas>
-            <div class="card-overlay">
-                <span class="badge">Sandbox</span>
-                <h3>Órbita Gravitacional</h3>
-                <small>Mueve el cursor para alterar el campo</small>
-            </div>
-        </article>
-
-        <!-- CAJA 5: ESTADO ACTUAL / NOW (2x1) -->
-        <article class="bento-card span-2x1 now-card" data-tilt>
-            <div class="card-content">
-                <span class="badge">📍 /now — En qué estoy enfocado</span>
-                <div class="now-grid">
-                    <div>
-                        <strong>Estudiando</strong>
-                        <p>Física teórica, ecuaciones diferenciales y métodos numéricos.</p>
-                    </div>
-                    <div>
-                        <strong>Desarrollando</strong>
-                        <p>Colección de juegos clásicos web sin anuncios con soporte PWA.</p>
-                    </div>
-                    <div>
-                        <strong>Entrenando</strong>
-                        <p>Fuerza en el gimnasio e inglés conversacional.</p>
-                    </div>
-                </div>
-            </div>
-        </article>
-
+        </section>
     </main>
+
+    <!-- FOOTER EDITORIAL GIGANTE -->
+    <footer class="footer-section" id="contacto">
+        <div class="footer-top">
+            <span>03 // ¿HABLAMOS?</span>
+            <span>ESTADO: ACTIVO</span>
+        </div>
+        <h2 class="footer-cta">CONSTRUYAMOS ALGO JUNTOS<span class="dot">.</span></h2>
+        <div class="footer-bottom">
+            <span>© 2026 LEONARDO VISCAYA</span>
+            <span>HOSTED ON PYTHONANYWHERE</span>
+        </div>
+    </footer>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

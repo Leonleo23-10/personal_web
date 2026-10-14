@@ -1,40 +1,36 @@
 /* ==========================================================================
-   1. VARIABLES DE COLOR (ACTUALIZAR AQUÍ TUS HEX EXACTOS)
+   1. TU PALETA EXACTA + TEMA CLARO / OSCURO EDITORIAL
    ========================================================================== */
-:root[data-theme="cream"] {
-    /* Tus colores principales base */
-    --bg-main: #F7F4EB;           /* Blanco tipo crema principal */
-    --bg-card: #EFECE1;           /* Crema un tono más cálido para las cajas */
-    --bg-card-hover: #E8E4D5;
-    
-    --leaf-primary: #2D5A3C;      /* Verde hoja profundo */
-    --leaf-accent: #4A8B5E;       /* Verde hoja vivo para brillos e interacciones */
-    --leaf-soft: rgba(45, 90, 60, 0.12);
-    
-    --text-main: #1C2820;         /* Casi negro con tinte verde bosque */
-    --text-muted: #526358;
-    --border-color: rgba(45, 90, 60, 0.16);
-    --spotlight-color: rgba(74, 139, 94, 0.22);
+:root {
+    --dust-grey: #dad7cdff;
+    --dry-sage: #a3b18aff;
+    --fern: #588157ff;
+    --hunter-green: #3a5a40ff;
+    --pine-teal: #344e41ff;
+
+    /* Modo por defecto: Papel Dust Grey con tinta Pine Teal */
+    --bg-primary: var(--dust-grey);
+    --bg-secondary: #cfccc0;
+    --text-primary: var(--pine-teal);
+    --text-secondary: var(--hunter-green);
+    --accent: var(--fern);
+    --accent-soft: var(--dry-sage);
+    --border-line: rgba(52, 78, 65, 0.22);
 }
 
-:root[data-theme="forest"] {
-    /* Versión invertida usando exactamente tu misma identidad */
-    --bg-main: #0F1912;           /* Verde bosque nocturno */
-    --bg-card: #16241B;
-    --bg-card-hover: #1D2F23;
-    
-    --leaf-primary: #5E9E72;      /* Verde hoja luminoso */
-    --leaf-accent: #82C998;
-    --leaf-soft: rgba(130, 201, 152, 0.14);
-    
-    --text-main: #F7F4EB;         /* Tu blanco crema pasa a ser el texto principal */
-    --text-muted: #A9B8AE;
-    --border-color: rgba(247, 244, 235, 0.12);
-    --spotlight-color: rgba(130, 201, 152, 0.18);
+:root[data-mode="dark"] {
+    /* Modo invertido: Fondo Pine Teal profundo con letras Dust Grey */
+    --bg-primary: var(--pine-teal);
+    --bg-secondary: var(--hunter-green);
+    --text-primary: var(--dust-grey);
+    --text-secondary: var(--dry-sage);
+    --accent: var(--dry-sage);
+    --accent-soft: var(--fern);
+    --border-line: rgba(218, 215, 205, 0.18);
 }
 
 /* ==========================================================================
-   2. RESET Y BASE
+   2. BASE & SCROLL FLUIDO
    ========================================================================== */
 * {
     box-sizing: border-box;
@@ -42,271 +38,396 @@
     padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family: 'Inter', sans-serif;
-    line-height: 1.5;
-    padding: 1.5rem;
-    transition: background-color 0.4s ease, color 0.4s ease;
-    min-height: 100vh;
+    line-height: 1.45;
+    overflow-x: hidden;
+    transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-h1, h2, h3 {
-    font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-}
-
-/* ==========================================================================
-   3. BARRA SUPERIOR Y BENTO GRID
-   ========================================================================== */
-.top-bar {
-    max-width: 1180px;
-    margin: 0 auto 1.5rem auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.status-dot {
-    width: 10px;
-    height: 10px;
-    background-color: var(--leaf-accent);
+/* Cursor circular que sigue al mouse (estilo Awwwards) */
+.custom-cursor {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--fern);
+    background: rgba(88, 129, 87, 0.15);
     border-radius: 50%;
-    box-shadow: 0 0 10px var(--leaf-accent);
-}
-
-.bento-grid {
-    max-width: 1180px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: minmax(210px, auto);
-    gap: 1.25rem;
-}
-
-.span-2x2 { grid-column: span 2; grid-row: span 2; }
-.span-2x1 { grid-column: span 2; grid-row: span 1; }
-.span-1x2 { grid-column: span 1; grid-row: span 2; }
-.span-1x1 { grid-column: span 1; grid-row: span 1; }
-
-/* ==========================================================================
-   4. TARJETAS INTERACTIVAS (SPOTLIGHT + TILT)
-   ========================================================================== */
-.bento-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 24px;
-    padding: 1.75rem;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                border-color 0.3s ease,
-                background-color 0.3s ease,
-                box-shadow 0.35s ease;
-    transform-style: preserve-3d;
-}
-
-/* Brillo radial que sigue al cursor (Awwwards Spotlight Effect) */
-.bento-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        var(--spotlight-color),
-        transparent 40%
-    );
-    opacity: 0;
-    transition: opacity 0.35s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
     pointer-events: none;
-    z-index: 0;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s ease, height 0.25s ease, background 0.25s ease;
 }
 
-.bento-card:hover::before {
-    opacity: 1;
-}
-
-.bento-card:hover {
-    border-color: var(--leaf-accent);
-    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.08);
-}
-
-.card-content {
-    position: relative;
-    z-index: 1;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 1rem;
+.custom-cursor.hovered {
+    width: 48px;
+    height: 48px;
+    background: rgba(88, 129, 87, 0.28);
 }
 
 /* ==========================================================================
-   5. COMPONENTES INTERNOS (BOTONES, BADGES, MINI-BUSCAMINAS)
+   3. NAVEGACIÓN FLOTANTE ESTILO "BELLO."
    ========================================================================== */
-.badge {
-    align-self: flex-start;
-    background: var(--leaf-soft);
-    color: var(--leaf-primary);
-    padding: 0.3rem 0.75rem;
+.nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.8rem 4vw;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+    border-bottom: 1px solid var(--border-line);
+}
+
+.brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.04em;
+}
+
+.dot { color: var(--fern); }
+
+.mode-switch-wrapper {
+    display: flex;
+    background: var(--bg-secondary);
+    padding: 4px;
     border-radius: 999px;
+    border: 1px solid var(--border-line);
+    gap: 4px;
+}
+
+.mode-pill {
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    padding: 0.45rem 1.1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mode-pill.active, .mode-pill:hover {
+    background: var(--hunter-green);
+    color: var(--dust-grey);
+}
+
+.nav-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   4. HERO EDITORIAL MONUMENTAL
+   ========================================================================== */
+.hero-section {
+    padding: 6vw 4vw 5vw;
+    min-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-line);
+}
+
+.hero-meta, .section-header, .footer-top, .footer-bottom {
+    display: flex;
+    justify-content: space-between;
     font-size: 0.78rem;
     font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
 }
 
-.hero-card h1 {
-    font-size: clamp(1.6rem, 2.5vw, 2.35rem);
+.display-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.4rem, 6.2vw, 6.4rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin: 3rem 0;
+    max-width: 16ch;
 }
 
-.hero-card p, .project-item p, .arcade-info p {
-    color: var(--text-muted);
-    font-size: 0.94rem;
+.italic-accent {
+    color: var(--fern);
+    font-style: italic;
+    font-weight: 700;
 }
 
-.btn-primary, .btn-pill, .btn-mini {
-    cursor: pointer;
-    border: none;
-    font-family: inherit;
-    font-weight: 600;
-    transition: all 0.2s ease;
+.amp {
+    color: var(--dry-sage);
 }
 
-.btn-primary {
-    display: inline-block;
-    background: var(--leaf-primary);
-    color: #F7F4EB;
+.hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+}
+
+.hero-bio {
+    max-width: 440px;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+}
+
+.scroll-indicator {
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    color: var(--fern);
+}
+
+/* ==========================================================================
+   5. LISTA DE PROYECTOS INTERACTIVA (ESTILO MIJOBELLO)
+   ========================================================================== */
+.works-section, .lab-section {
+    padding: 6vw 4vw;
+    border-bottom: 1px solid var(--border-line);
+}
+
+.work-list {
+    margin-top: 3rem;
+    border-top: 1px solid var(--border-line);
+}
+
+.work-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.4rem 1rem;
+    border-bottom: 1px solid var(--border-line);
     text-decoration: none;
-    padding: 0.7rem 1.3rem;
-    border-radius: 14px;
+    color: var(--text-primary);
+    position: relative;
+    transition: padding 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.35s ease;
 }
 
-.btn-primary:hover {
-    background: var(--leaf-accent);
+.work-left {
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+}
+
+.work-index {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--fern);
+}
+
+.work-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 3.5vw, 3.2rem);
+    font-weight: 700;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.work-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.work-arrow {
+    font-size: 1.5rem;
+    transition: transform 0.35s ease;
+}
+
+/* Micro-interacción al pasar el cursor sobre cada fila */
+.work-row:hover {
+    background-color: color-mix(in srgb, var(--dry-sage) 22%, transparent);
+    padding-left: 2.2rem;
+    padding-right: 2.2rem;
+}
+
+.work-row:hover .work-title {
+    transform: translateX(12px);
+    color: var(--hunter-green);
+}
+
+:root[data-mode="dark"] .work-row:hover .work-title {
+    color: var(--dry-sage);
+}
+
+.work-row:hover .work-arrow {
+    transform: translate(5px, -5px);
+    color: var(--fern);
+}
+
+/* Etiqueta flotante que sigue al cursor al inspeccionar un proyecto */
+.floating-preview {
+    position: fixed;
+    pointer-events: none;
+    z-index: 900;
+    background: var(--pine-teal);
+    color: var(--dust-grey);
+    padding: 0.65rem 1.2rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--dry-sage);
+    opacity: 0;
+    transform: translate(-50%, -140%) scale(0.85);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.floating-preview.visible {
+    opacity: 1;
+    transform: translate(-50%, -140%) scale(1);
+}
+
+/* ==========================================================================
+   6. SECCIÓN ARCADE / BUSCAMINAS BOTÁNICO
+   ========================================================================== */
+.lab-showcase {
+    margin-top: 3.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4vw;
+    align-items: center;
+}
+
+.pill-tag {
+    display: inline-block;
+    background: var(--dry-sage);
+    color: var(--pine-teal);
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    margin-bottom: 1.2rem;
+}
+
+.lab-description h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    margin-bottom: 1rem;
+}
+
+.lab-description p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    max-width: 50ch;
+}
+
+.game-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.btn-editorial {
+    border: 1px solid var(--hunter-green);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 0.7rem 1.25rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-editorial.active, .btn-editorial:hover {
+    background: var(--hunter-green);
+    color: var(--dust-grey);
     transform: translateY(-2px);
 }
 
-.btn-pill {
-    background: var(--bg-card);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
+.btn-outline {
+    background: transparent;
+    border-style: dashed;
 }
 
-/* Mini Buscaminas dentro de la tarjeta */
-.arcade-layout {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.2rem;
-}
-
-.arcade-controls {
+.board-container {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+    justify-content: center;
 }
 
-.btn-mini {
-    background: var(--bg-main);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    padding: 0.4rem 0.75rem;
-    border-radius: 10px;
-    font-size: 0.8rem;
-}
-
-.btn-mini.active-dig {
-    background: var(--leaf-primary);
-    color: #F7F4EB;
-}
-
-.mini-minesweeper {
+.minesweeper-board {
     display: grid;
-    grid-template-columns: repeat(4, 38px);
-    grid-template-rows: repeat(4, 38px);
-    gap: 5px;
-    background: var(--bg-main);
-    padding: 8px;
-    border-radius: 14px;
-    border: 1px solid var(--border-color);
+    grid-template-columns: repeat(8, minmax(34px, 44px));
+    grid-template-rows: repeat(8, minmax(34px, 44px));
+    gap: 6px;
+    background: var(--pine-teal);
+    padding: 14px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px -15px rgba(52, 78, 65, 0.35);
 }
 
 .mine-cell {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: var(--dry-sage);
+    border: none;
     border-radius: 8px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    color: var(--pine-teal);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-main);
-    user-select: none;
-    transition: transform 0.12s ease, background 0.2s;
+    transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
-.mine-cell:hover { transform: scale(1.06); border-color: var(--leaf-accent); }
-.mine-cell.revealed { background: var(--leaf-soft); cursor: default; }
-.mine-cell.boom { background: #d9534f; color: white; }
-
-/* Proyectos y Canvas */
-.project-list { display: flex; flex-direction: column; gap: 1rem; }
-.project-item {
-    background: var(--bg-main);
-    padding: 1rem;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-}
-.tags { display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap; }
-.tags span {
-    font-size: 0.72rem;
-    padding: 0.15rem 0.55rem;
-    border-radius: 6px;
-    background: var(--leaf-soft);
-    color: var(--leaf-primary);
+.mine-cell:hover {
+    background: var(--fern);
+    color: var(--dust-grey);
+    transform: scale(1.06);
 }
 
-.canvas-card { padding: 0; }
-#gravity-canvas { width: 100%; height: 100%; display: block; }
-.card-overlay {
-    position: absolute;
-    bottom: 1rem;
-    left: 1.2rem;
-    pointer-events: none;
+.mine-cell.revealed {
+    background: var(--dust-grey);
+    color: var(--pine-teal);
+    cursor: default;
+    transform: none;
 }
 
-.now-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+.mine-cell.boom {
+    background: #b54845;
+    color: var(--dust-grey);
 }
 
 /* ==========================================================================
-   6. RESPONSIVE (MÓVIL Y TABLET)
+   7. FOOTER EDITORIAL
    ========================================================================== */
-@media (max-width: 960px) {
-    .bento-grid { grid-template-columns: repeat(2, 1fr); }
-    .span-1x2 { grid-column: span 2; grid-row: span 1; }
+.footer-section {
+    padding: 6vw 4vw 3vw;
+    background: var(--pine-teal);
+    color: var(--dust-grey);
 }
 
-@media (max-width: 640px) {
-    .bento-grid { grid-template-columns: 1fr; }
-    .span-2x2, .span-2x1, .span-1x2, .span-1x1 { grid-column: span 1; grid-row: auto; }
-    .arcade-layout { flex-direction: column; align-items: flex-start; }
-    .now-grid { grid-template-columns: 1fr; }
+.footer-section .footer-top, .footer-section .footer-bottom {
+    color: var(--dry-sage);
+}
+
+.footer-cta {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 5.5vw, 5.5rem);
+    margin: 3.5rem 0;
+    line-height: 1;
+}
+
+@media (max-width: 860px) {
+    .lab-showcase { grid-template-columns: 1fr; }
+    .work-row { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+    .custom-cursor, .floating-preview { display: none; }
 }

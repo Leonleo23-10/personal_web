@@ -1,160 +1,170 @@
-// 1. Efecto Spotlight + Tilt 3D suave en las tarjetas Bento
-const cards = document.querySelectorAll('.bento-card');
+// 1. Cursor personalizado y vista previa flotante en las filas de proyectos
+const cursor = document.getElementById('custom-cursor');
+const preview = document.getElementById('floating-preview');
+const previewTag = document.getElementById('preview-tag');
 
-cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+document.addEventListener('mousemove', (e) => {
+    cursor.style.left = `${e.clientX}px`;
+    cursor.style.top = `${e.clientY}px`;
+    preview.style.left = `${e.clientX}px`;
+    preview.style.top = `${e.clientY}px`;
+});
 
-        // Variables para el brillo radial en CSS
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-
-        // Inclinación sutil 3D
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -2.5;
-        const rotateY = ((x - centerX) / centerX) * 2.5;
-
-        card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-3px)`;
+document.querySelectorAll('.work-row').forEach(row => {
+    row.addEventListener('mouseenter', () => {
+        cursor.classList.add('hovered');
+        previewTag.textContent = row.dataset.preview;
+        preview.classList.add('visible');
     });
-
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)';
+    row.addEventListener('mouseleave', () => {
+        cursor.classList.remove('hovered');
+        preview.classList.remove('visible');
     });
 });
 
-// 2. Conmutador de Tema (Crema <-> Bosque)
-const themeBtn = document.getElementById('theme-toggle');
-themeBtn.addEventListener('click', () => {
-    const html = document.documentElement;
-    const next = html.getAttribute('data-theme') === 'cream' ? 'forest' : 'cream';
-    html.setAttribute('data-theme', next);
+// 2. Navegación por píldoras (Proyectos / Arcade / Tema Claro-Oscuro)
+document.querySelectorAll('.mode-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+        const target = pill.dataset.target;
+        if (target === 'theme') {
+            const html = document.documentElement;
+            html.dataset.mode = html.dataset.mode === 'light' ? 'dark' : 'light';
+            return;
+        }
+        document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const section = target === 'work' ? '#proyectos' : '#arcade';
+        document.querySelector(section).scrollIntoView({ behavior: 'smooth' });
+    });
 });
 
-// 3. Mini-Buscaminas 4x4 en vivo dentro del Bento
-const boardEl = document.getElementById('mini-board');
+// 3. Buscaminas 8x8 con "Primer Clic Siempre Seguro"
+const SIZE = 8;
+const MINES_COUNT = 10;
+const boardEl = document.getElementById('minesweeper-board');
+const statusEl = document.getElementById('mine-status');
 const modeBtn = document.getElementById('mode-toggle');
 const resetBtn = document.getElementById('reset-mines');
+
 let flagMode = false;
-let mines = new Set();
+let firstClick = true;
 let gameOver = false;
+let mines = new Set();
+let cells = [];
 
 modeBtn.addEventListener('click', () => {
     flagMode = !flagMode;
-    modeBtn.textContent = flagMode ? '🚩 Bandera' : '⛏️ Cavar';
-    modeBtn.classList.toggle('active-dig', !flagMode);
+    modeBtn.textContent = flagMode ? '🚩 Modo Bandera' : '⛏️ Modo Cavar';
+    modeBtn.classList.toggle('active', !flagMode);
 });
 
-function initMiniMinesweeper() {
+function initBoard() {
     boardEl.innerHTML = '';
     mines.clear();
+    cells = [];
+    firstClick = true;
     gameOver = false;
-    while (mines.size < 3) {
-        mines.add(Math.floor(Math.random() * 16));
-    }
+    statusEl.textContent = 'Minas ocultas: 10 · Primer clic siempre seguro.';
 
-    for (let i = 0; i < 16; i++) {
-        const cell = document.createElement('button');
-        cell.className = 'mine-cell';
-        cell.addEventListener('click', () => handleCellClick(i, cell));
-        boardEl.appendChild(cell);
+    for (let i = 0; i < SIZE * SIZE; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'mine-cell';
+        btn.addEventListener('click', () => onCellClick(i));
+        btn.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            toggleFlag(i);
+        });
+        boardEl.appendChild(btn);
+        cells.push(btn);
     }
 }
 
-function handleCellClick(idx, cell) {
+function placeMines(safeIndex) {
+    while (mines.size < MINES_COUNT) {
+        const idx = Math.floor(Math.random() * (SIZE * SIZE));
+        if (idx !== safeIndex) mines.add(idx);
+    }
+}
+
+function toggleFlag(idx) {
+    const cell = cells[idx];
     if (gameOver || cell.classList.contains('revealed')) return;
+    cell.textContent = cell.textContent === '🚩' ? '' : '🚩';
+    if (navigator.vibrate) navigator.vibrate(25);
+}
+
+function onCellClick(idx) {
+    if (gameOver) return;
     if (flagMode) {
-        cell.textContent = cell.textContent === '🚩' ? '' : '🚩';
-        if (navigator.vibrate) navigator.vibrate(30);
+        toggleFlag(idx);
         return;
     }
-    if (cell.textContent === '🚩') return;
 
-    cell.classList.add('revealed');
+    const cell = cells[idx];
+    if (cell.textContent === '🚩' || cell.classList.contains('revealed')) return;
+
+    if (firstClick) {
+        placeMines(idx);
+        firstClick = false;
+    }
+
     if (mines.has(idx)) {
         cell.textContent = '💣';
         cell.classList.add('boom');
+        statusEl.textContent = '💥 ¡Pisaste una mina! Dale a "Nuevo Tablero" para intentar otra vez.';
         gameOver = true;
+        mines.forEach(m => { cells[m].textContent = '💣'; });
         return;
     }
 
-    // Contar minas vecinas en matriz 4x4
-    const r = Math.floor(idx / 4), c = idx % 4;
+    revealCell(idx);
+    checkWin();
+}
+
+function revealCell(idx) {
+    const cell = cells[idx];
+    if (cell.classList.contains('revealed') || cell.textContent === '🚩') return;
+    cell.classList.add('revealed');
+
+    const r = Math.floor(idx / SIZE), c = idx % SIZE;
     let count = 0;
+    const neighbors = [];
+
     for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
             const nr = r + dr, nc = c + dc;
-            if (nr >= 0 && nr < 4 && nc >= 0 && nc < 4 && mines.has(nr * 4 + nc)) count++;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+                const nIdx = nr * SIZE + nc;
+                neighbors.push(nIdx);
+                if (mines.has(nIdx)) count++;
+            }
         }
     }
-    cell.textContent = count > 0 ? count : '';
+
+    if (count > 0) {
+        cell.textContent = count;
+    } else {
+        neighbors.forEach(nIdx => revealCell(nIdx));
+    }
 }
 
-resetBtn.addEventListener('click', initMiniMinesweeper);
-initMiniMinesweeper();
-
-// 4. Mini-Simulación Orbital en Canvas
-const canvas = document.getElementById('gravity-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-let attractor = { x: 120, y: 100 };
-
-function resizeCanvas() {
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight;
-    attractor = { x: canvas.width / 2, y: canvas.height / 2 };
+function checkWin() {
+    const revealedCount = cells.filter(c => c.classList.contains('revealed')).length;
+    if (revealedCount === SIZE * SIZE - MINES_COUNT) {
+        statusEl.textContent = '🌿 ¡Victoria limpia! Despejaste todo el campo.';
+        gameOver = true;
+    }
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
-canvas.addEventListener('mousemove', (e) => {
-    const r = canvas.getBoundingClientRect();
-    attractor.x = e.clientX - r.left;
-    attractor.y = e.clientY - r.top;
+resetBtn.addEventListener('click', initBoard);
+initBoard();
+
+// 4. Botón para descargar la página como archivo .HTML 100% portable y offline
+document.getElementById('download-game').addEventListener('click', () => {
+    const htmlContent = document.documentElement.outerHTML;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'buscaminas_botanico_offline.html';
+    a.click();
 });
-
-for (let i = 0; i < 18; i++) {
-    particles.push({
-        x: Math.random() * 200,
-        y: Math.random() * 200,
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2
-    });
-}
-
-function animateOrbit() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const accent = getComputedStyle(document.documentElement).getPropertyValue('--leaf-primary').trim();
-    ctx.fillStyle = accent;
-
-    // Atractor central
-    ctx.beginPath();
-    ctx.arc(attractor.x, attractor.y, 5, 0, Math.PI * 2);
-    ctx.fill();
-
-    particles.forEach(p => {
-        const dx = attractor.x - p.x;
-        const dy = attractor.y - p.y;
-        const distSq = Math.max(dx * dx + dy * dy, 120);
-        const force = 35 / distSq;
-        p.vx += dx * force;
-        p.vy += dy * force;
-        p.vx *= 0.985;
-        p.vy *= 0.985;
-        p.x += p.vx;
-        p.y += p.vy;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    requestAnimationFrame(animateOrbit);
-}
-animateOrbit();
-
-// 5. Registro del Service Worker (Modo Offline)
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-}
