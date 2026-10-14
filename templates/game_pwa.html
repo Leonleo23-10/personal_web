@@ -33,7 +33,7 @@ DISEÑO:
     </header>
 
     <main class="game-center-container">
-        <!-- BARRA DE ESTADO Y ACCIONES RÁPIDAS ENCIMA DEL TABLERO -->
+       <!-- BARRA DE ESTADO Y ACCIONES RÁPIDAS ENCIMA DEL TABLERO -->
         <div class="game-hud-bar">
             <div class="hud-stats">
                 <div class="stat-pill">
@@ -48,20 +48,36 @@ DISEÑO:
 
             <div class="hud-controls">
                 {% if game_id == 'buscaminas' %}
-                <button class="btn-editorial active diff-btn" data-size="8" data-mines="10">8x8</button>
-                <button class="btn-editorial diff-btn" data-size="10" data-mines="16">10x10</button>
-                <button class="btn-editorial diff-btn" data-size="12" data-mines="24">12x12</button>
+                <select id="mine-preset-select" class="btn-editorial select-editorial">
+                    <option value="8,8,10">Principiante (8×8 · 10)</option>
+                    <option value="9,9,12">Fácil (9×9 · 12)</option>
+                    <option value="12,12,24">Mediano (12×12 · 24)</option>
+                    <option value="16,16,40">Difícil (16×16 · 40)</option>
+                    <option value="20,16,68">Enorme (20×16 · 68)</option>
+                    <option value="custom">Personalizado...</option>
+                </select>
                 <button id="mode-toggle" class="btn-editorial active">
                     <span class="btn-icon-svg" id="mode-icon"></span>
                     <span id="mode-label">Cavar</span>
                 </button>
                 {% elif game_id == 'sudoku' %}
                 <button id="sudoku-check" class="btn-editorial">Verificar</button>
+                {% elif game_id == '2048' %}
+                <button id="toggle-2048-anim" class="btn-editorial">Animación: OFF</button>
                 {% endif %}
                 <button id="universal-reset-btn" class="btn-editorial active">Nuevo Tablero</button>
             </div>
         </div>
 
+        {% if game_id == 'buscaminas' %}
+        <!-- Barra desplegable para el modo Personalizado de Buscaminas -->
+        <div class="custom-mine-bar" id="custom-mine-bar" hidden>
+            <label>Columnas <input type="number" id="custom-cols" min="5" max="24" value="14"></label>
+            <label>Filas <input type="number" id="custom-rows" min="5" max="20" value="14"></label>
+            <label>Minas <input type="number" id="custom-mines" min="1" max="200" value="30"></label>
+            <button id="apply-custom-mines" class="btn-editorial active">Crear Tablero</button>
+        </div>
+        {% endif %}
         <!-- ESCENARIO CENTRAL DEL JUEGO (MAXIMIZADO Y CENTRADO) -->
         <div class="game-stage-wrapper">
 

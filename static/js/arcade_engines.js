@@ -123,7 +123,263 @@ function attachTouchSwipe(element, callbacks) {
     }, { passive: true });
 }
 
+/* ============================================================================
+   CARTUCHO 01: BUSCAMINAS PRO (6 MODOS + PERSONALIZADO + ONDA EXPANSIVA)
+   ============================================================================ */
+if (activeGame === 'buscaminas') {
+    const boardEl = document.getElementById('minesweeper-board');
+    const presetSelect = document.getElementById('mine-preset-select');
+    const customBar = document.getElementById('custom-mine-bar');
+    const applyCustomBtn = document.getElementById('apply-custom-mines');
+    const modeBtn = document.getElementById('mode-toggle');
+    const modeIcon = document.getElementById('mode-icon');
+    const modeLabel = document.getElementById('mode-label');
 
+    const SVG_FLAG_PRO = `<svg viewBox="0 0 24 24" fill="none"><path d="M5 21V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M5 4L19 9L5 14V4Z" fill="#588157" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
+    const SVG_PICK_PRO = `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>`;
+    const SVG_MINE_PRO = `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5.5" fill="currentColor"/><path d="M12 3V21M3 12H21M5.6 5.6L18.4 18.4M18.4 5.6L5.6 18.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+    let COLS = 8, ROWS = 8, MINES_COUNT = 10;
+    let flagMode = false, firstClick = true, gameOver = false;
+    let mines = new Set(), cells = [], counts = [];
+    let explosionTimers = [];
+
+    if (hudLabelEl) hudLabelEl.textContent = 'MINAS RESTANTES';
+
+    function updateFlagCounter() {
+        const placed = cells.filter(c => c.classList.contains('flagged')).length;
+        if (hudCurrentEl) hudCurrentEl.textContent = Math.max(0, MINES_COUNT - placed);
+    }
+
+    function updateModeUI() {
+        if (!modeBtn) return;
+        if (modeIcon) modeIcon.innerHTML = flagMode ? SVG_FLAG_PRO : SVG_PICK_PRO;
+        if (modeLabel) modeLabel.textContent = flagMode ? 'Bandera' : 'Cavar';
+        modeBtn.classList.toggle('active', !flagMode);
+    }
+
+    if (modeBtn) {
+        updateModeUI();
+        modeBtn.addEventListener('click', () => {
+            flagMode = !flagMode;
+            updateModeUI();
+        });
+    }
+
+    if (presetSelect) {
+        presetSelect.addEventListener('change', () => {
+            if (presetSelect.value === 'custom') {
+                customBar.hidden = false;
+                return;
+            }
+            customBar.hidden = true;
+            const [c, r, m] = presetSelect.value.split(',').map(Number);
+            COLS = c; ROWS = r; MINES_COUNT = m;
+            initProMinesweeper();
+        });
+    }
+
+    if (applyCustomBtn) {
+        applyCustomBtn.addEventListener('click', () => {
+            const c = Math.max(5, Math.min(24, parseInt(document.getElementById('custom-cols').value, 10) || 10));
+            const r = Math.max(5, Math.min(20, parseInt(document.getElementById('custom-rows').value, 10) || 10));
+            const maxMines = Math.max(1, (c * r) - 9);
+            const m = Math.max(1, Math.min(maxMines, parseInt(document.getElementById('custom-mines').value, 10) || 15));
+            document.getElementById('custom-cols').value = c;
+            document.getElementById('custom-rows').value = r;
+            document.getElementById('custom-mines').value = m;
+            COLS = c; ROWS = r; MINES_COUNT = m;
+            initProMinesweeper();
+        });
+    }
+
+    function getNeighbors(idx) {
+        const r = Math.floor(idx / COLS), c = idx % COLS;
+        const list = [];
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                if (dr === 0 && dc === 0) continue;
+                const nr = r + dr, nc = c + dc;
+                if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+                    list.push(nr * COLS + nc);
+                }
+            }
+        }
+        return list;
+    }
+
+    function initProMinesweeper() {
+        hideGameOverlay();
+        explosionTimers.forEach(t => clearTimeout(t));
+        explosionTimers = [];
+
+        boardEl.innerHTML = '';
+        mines.clear();
+        cells = [];
+        counts = new Array(COLS * ROWS).fill(0);
+        firstClick = true;
+        gameOver = false;
+
+        // Ajustar tamaño de casilla automáticamente según el ancho del tablero
+        const cellSize = COLS >= 16 ? 'clamp(24px, 4.8vw, 34px)'
+                       : COLS >= 12 ? 'clamp(28px, 6.5vw, 40px)'
+                       : 'clamp(36px, 9.2vw, 50px)';
+        boardEl.style.gridTemplateColumns = `repeat(${COLS}, ${cellSize})`;
+
+        for (let i = 0; i < COLS * ROWS; i++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mine-cell';
+            btn.addEventListener('click', () => onCellClick(i));
+            btn.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                toggleFlag(i);
+            });
+            boardEl.appendChild(btn);
+            cells.push(btn);
+        }
+        updateFlagCounter();
+    }
+
+    function placeMines(safeIndex) {
+        const safeZone = new Set([safeIndex, ...getNeighbors(safeIndex)]);
+        while (mines.size < MINES_COUNT) {
+            const idx = Math.floor(Math.random() * (COLS * ROWS));
+            if (!safeZone.has(idx)) mines.add(idx);
+        }
+        for (let i = 0; i < COLS * ROWS; i++) {
+            counts[i] = getNeighbors(i).filter(n => mines.has(n)).length;
+        }
+    }
+
+    function toggleFlag(idx) {
+        const cell = cells[idx];
+        if (gameOver || cell.classList.contains('revealed')) return;
+        const isFlagged = cell.classList.toggle('flagged');
+        cell.innerHTML = isFlagged ? SVG_FLAG_PRO : '';
+        updateFlagCounter();
+    }
+
+    function onCellClick(idx) {
+        if (gameOver) return;
+        const cell = cells[idx];
+
+        // Chording: Despejar vecinas al tocar un número que ya tiene sus banderas completas
+        if (cell.classList.contains('revealed')) {
+            const needed = counts[idx];
+            if (needed > 0) {
+                const neighbors = getNeighbors(idx);
+                const flaggedCount = neighbors.filter(n => cells[n].classList.contains('flagged')).length;
+                if (flaggedCount === needed) {
+                    neighbors.forEach(n => {
+                        if (!cells[n].classList.contains('flagged') && !cells[n].classList.contains('revealed')) {
+                            triggerReveal(n);
+                        }
+                    });
+                    checkWin();
+                }
+            }
+            return;
+        }
+
+        if (flagMode) {
+            toggleFlag(idx);
+            return;
+        }
+        if (cell.classList.contains('flagged')) return;
+
+        if (firstClick) {
+            placeMines(idx);
+            firstClick = false;
+        }
+
+        triggerReveal(idx);
+        checkWin();
+    }
+
+    // Animación de Onda Expansiva Radial cuando pierdes
+    function triggerRadialExplosion(epicenterIdx) {
+        gameOver = true;
+        const epiR = Math.floor(epicenterIdx / COLS);
+        const epiC = epicenterIdx % COLS;
+
+        // 1. Estallar el epicentro inmediatamente
+        cells[epicenterIdx].innerHTML = SVG_MINE_PRO;
+        cells[epicenterIdx].classList.add('boom', 'boom-epicenter');
+
+        // 2. Propagar onda de choque visual por todas las casillas según su distancia radial
+        cells.forEach((cell, idx) => {
+            const r = Math.floor(idx / COLS), c = idx % COLS;
+            const dist = Math.hypot(r - epiR, c - epiC);
+            const waveDelay = Math.round(dist * 55);
+
+            const tWave = setTimeout(() => {
+                cell.classList.add('shockwave-pulse');
+            }, waveDelay);
+            explosionTimers.push(tWave);
+        });
+
+        // 3. Hacer estallar cada mina en cadena conforme la onda la alcanza
+        let maxDelay = 0;
+        mines.forEach(mIdx => {
+            if (mIdx === epicenterIdx) return;
+            const r = Math.floor(mIdx / COLS), c = mIdx % COLS;
+            const dist = Math.hypot(r - epiR, c - epiC);
+            const delay = Math.round(dist * 75) + Math.floor(Math.random() * 45);
+            if (delay > maxDelay) maxDelay = delay;
+
+            const tMine = setTimeout(() => {
+                const mCell = cells[mIdx];
+                mCell.classList.remove('flagged');
+                mCell.innerHTML = SVG_MINE_PRO;
+                mCell.classList.add('boom', 'boom-chain');
+                if (navigator.vibrate) navigator.vibrate(18);
+            }, delay);
+            explosionTimers.push(tMine);
+        });
+
+        // 4. Mostrar el modal de fin de partida cuando termine la cadena de explosiones
+        const tModal = setTimeout(() => {
+            showGameOverlay('Reacción en Cadena', '¡Mina Detonada!', 'Todas las minas del campo estallaron desde el punto de impacto.');
+        }, maxDelay + 650);
+        explosionTimers.push(tModal);
+    }
+
+    function triggerReveal(idx) {
+        if (mines.has(idx)) {
+            triggerRadialExplosion(idx);
+            return;
+        }
+        revealCell(idx);
+    }
+
+    function revealCell(idx) {
+        const cell = cells[idx];
+        if (cell.classList.contains('revealed') || cell.classList.contains('flagged')) return;
+        cell.classList.add('revealed');
+
+        const count = counts[idx];
+        if (count > 0) {
+            cell.textContent = count;
+            cell.dataset.num = count;
+        } else {
+            getNeighbors(idx).forEach(nIdx => revealCell(nIdx));
+        }
+    }
+
+    function checkWin() {
+        if (gameOver) return;
+        const revealedCount = cells.filter(c => c.classList.contains('revealed')).length;
+        if (revealedCount === COLS * ROWS - MINES_COUNT) {
+            gameOver = true;
+            syncScoreWithServer(bestScore + 1);
+            showGameOverlay('Campo Despejado', '¡Victoria Limpia!', `Desactivaste las ${MINES_COUNT} minas sin un solo error.`);
+        }
+    }
+
+    currentResetCallback = initProMinesweeper;
+    initProMinesweeper();
+}
 /* ============================================================================
    CARTUCHO 02: SUDOKU CON SELECTOR NUMÉRICO FLOTANTE (POPOVER)
    ============================================================================ */
@@ -807,35 +1063,57 @@ if (activeGame === 'tetris') {
 
 
 /* ============================================================================
-   CARTUCHO 05: 2048 CENTRADO Y MAXIMIZADO
+   CARTUCHO 05: 2048 BOTÁNICO (CON INTERRUPTOR DE ANIMACIONES ON / OFF)
    ============================================================================ */
 if (activeGame === '2048') {
     const boardEl = document.getElementById('board-2048');
+    const animToggleBtn = document.getElementById('toggle-2048-anim');
     let grid = Array(16).fill(0);
     let score = 0;
+    let animationsEnabled = localStorage.getItem('2048_anim') === 'on';
 
     if (hudLabelEl) hudLabelEl.textContent = 'PUNTOS';
+
+    function updateAnimButton() {
+        if (!animToggleBtn) return;
+        animToggleBtn.textContent = `Animación: ${animationsEnabled ? 'ON' : 'OFF'}`;
+        animToggleBtn.classList.toggle('active', animationsEnabled);
+        boardEl.classList.toggle('no-anim', !animationsEnabled);
+    }
+
+    if (animToggleBtn) {
+        updateAnimButton();
+        animToggleBtn.addEventListener('click', () => {
+            animationsEnabled = !animationsEnabled;
+            localStorage.setItem('2048_anim', animationsEnabled ? 'on' : 'off');
+            updateAnimButton();
+        });
+    }
 
     function addRandomTile() {
         const empty = grid.map((v, i) => (v === 0 ? i : -1)).filter(i => i !== -1);
         if (empty.length > 0) {
             const idx = empty[Math.floor(Math.random() * empty.length)];
             grid[idx] = Math.random() < 0.9 ? 2 : 4;
+            return idx;
         }
+        return -1;
     }
 
     function slideRow(row) {
         const filtered = row.filter(v => v !== 0);
+        const mergedIndices = new Set();
         for (let i = 0; i < filtered.length - 1; i++) {
             if (filtered[i] === filtered[i + 1]) {
                 filtered[i] *= 2;
                 score += filtered[i];
                 filtered[i + 1] = 0;
+                mergedIndices.add(i);
             }
         }
         const merged = filtered.filter(v => v !== 0);
         while (merged.length < 4) merged.push(0);
-        return merged;
+        return { line: merged, hadMerge: mergedIndices.size > 0 };
     }
 
     function hasMovesLeft() {
@@ -859,7 +1137,8 @@ if (activeGame === '2048') {
                 line.push(grid[idx]);
             }
             if (dir === 'right' || dir === 'down') line.reverse();
-            line = slideRow(line);
+            const res = slideRow(line);
+            line = res.line;
             if (dir === 'right' || dir === 'down') line.reverse();
             for (let j = 0; j < 4; j++) {
                 const idx = (dir === 'left' || dir === 'right') ? i * 4 + j : j * 4 + i;
@@ -867,10 +1146,10 @@ if (activeGame === '2048') {
             }
         }
         if (prev.some((v, idx) => v !== grid[idx])) {
-            addRandomTile();
+            const spawnedIdx = addRandomTile();
             if (hudCurrentEl) hudCurrentEl.textContent = score;
             syncScoreWithServer(score);
-            render2048();
+            render2048(prev, spawnedIdx);
 
             if (!hasMovesLeft()) {
                 showGameOverlay('Tablero Lleno', `${score} Puntos`, 'Ya no quedan movimientos disponibles.');
@@ -878,16 +1157,35 @@ if (activeGame === '2048') {
         }
     }
 
-    function render2048() {
-        boardEl.innerHTML = '';
-        grid.forEach(val => {
-            const tile = document.createElement('div');
+    function render2048(prevGrid = null, spawnedIdx = -1) {
+        const existingTiles = boardEl.querySelectorAll('.tile-2048');
+        if (existingTiles.length !== 16) {
+            boardEl.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'tile-2048';
+                boardEl.appendChild(tile);
+            }
+        }
+
+        const tiles = boardEl.querySelectorAll('.tile-2048');
+        grid.forEach((val, idx) => {
+            const tile = tiles[idx];
             tile.className = `tile-2048 ${val > 0 ? 'filled' : ''}`;
             if (val > 0) {
                 tile.dataset.val = val;
                 tile.textContent = val;
+                if (animationsEnabled) {
+                    if (idx === spawnedIdx) {
+                        tile.classList.add('tile-spawn');
+                    } else if (prevGrid && prevGrid[idx] !== val) {
+                        tile.classList.add('tile-merge');
+                    }
+                }
+            } else {
+                delete tile.dataset.val;
+                tile.textContent = '';
             }
-            boardEl.appendChild(tile);
         });
     }
 
@@ -898,6 +1196,7 @@ if (activeGame === '2048') {
         if (hudCurrentEl) hudCurrentEl.textContent = '0';
         addRandomTile();
         addRandomTile();
+        updateAnimButton();
         render2048();
     }
 
@@ -920,7 +1219,6 @@ if (activeGame === '2048') {
     currentResetCallback = init2048;
     init2048();
 }
-
 
 /* ============================================================================
    CARTUCHO 06: SNAKE RETRO CENTRADO
