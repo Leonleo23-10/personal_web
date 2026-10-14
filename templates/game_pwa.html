@@ -1,8 +1,19 @@
 <!DOCTYPE html>
+<!--
+================================================================================
+VISTA INDIVIDUAL DE JUEGO CENTRADA (CENTER-STAGE): templates/game_pwa.html
+================================================================================
+DISEÑO:
+- Barra superior compacta (.game-hud-bar) con controles esenciales y récords SQL.
+- Área de juego centrada (.game-stage-area) sin botones direccionales estorbando.
+- Modal superpuesto (#game-overlay) que emerge sobre el tablero al ganar/perder.
+- Popover flotante (#sudoku-popover) que aparece sobre la celda tocada en Sudoku.
+================================================================================
+-->
 <html lang="es" data-mode="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{{ game.title }} — App Offline</title>
     <link rel="manifest" href="/arcade/{{ game_id }}/manifest.json">
     <link rel="icon" type="image/svg+xml" href="/arcade/{{ game_id }}/icon.svg">
@@ -11,144 +22,101 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body data-game-scope="/arcade/{{ game_id }}/" data-active-game="{{ game_id }}">
+<body data-game-scope="/arcade/{{ game_id }}/" data-active-game="{{ game_id }}" class="arcade-fullscreen-body">
 
-    <header class="nav-header">
+    <header class="nav-header compact-nav">
         <a href="/arcade" class="brand">← {{ game.short_name }}<span class="dot">.</span></a>
-        <div class="mode-switch-wrapper">
+        <div class="hud-Right">
             <button class="mode-pill" id="theme-toggle">Tema</button>
+            <button id="pwa-install-btn" class="btn-editorial active">Instalar App</button>
         </div>
-        <button id="pwa-install-btn" class="btn-editorial active">Instalar {{ game.short_name }} como App</button>
     </header>
 
-    <main class="works-section">
-        <div class="section-header">
-            <span>CARTUCHO {{ game.number }} // APLICACIÓN INDEPENDIENTE SIN ANUNCIOS</span>
-            <span>100% OFFLINE READY</span>
+    <main class="game-center-container">
+        <!-- BARRA DE ESTADO Y ACCIONES RÁPIDAS ENCIMA DEL TABLERO -->
+        <div class="game-hud-bar">
+            <div class="hud-stats">
+                <div class="stat-pill">
+                    <span class="stat-label" id="current-stat-label">ESTADO</span>
+                    <strong id="hud-current-val">Activo</strong>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-label">{{ game.score_label }}</span>
+                    <strong id="hud-best-val">0</strong>
+                </div>
+            </div>
+
+            <div class="hud-controls">
+                {% if game_id == 'buscaminas' %}
+                <button class="btn-editorial active diff-btn" data-size="8" data-mines="10">8x8</button>
+                <button class="btn-editorial diff-btn" data-size="10" data-mines="16">10x10</button>
+                <button class="btn-editorial diff-btn" data-size="12" data-mines="24">12x12</button>
+                <button id="mode-toggle" class="btn-editorial active">
+                    <span class="btn-icon-svg" id="mode-icon"></span>
+                    <span id="mode-label">Cavar</span>
+                </button>
+                {% elif game_id == 'sudoku' %}
+                <button id="sudoku-check" class="btn-editorial">Verificar</button>
+                {% endif %}
+                <button id="universal-reset-btn" class="btn-editorial active">Nuevo Tablero</button>
+            </div>
         </div>
 
-        <div class="lab-showcase" style="margin-top: 2rem;">
+        <!-- ESCENARIO CENTRAL DEL JUEGO (MAXIMIZADO Y CENTRADO) -->
+        <div class="game-stage-wrapper">
 
             {% if game_id == 'buscaminas' %}
-            <!-- 01. BUSCAMINAS -->
-            <div class="lab-description">
-                <h2>{{ game.title }}</h2>
-                <p id="mine-status">Minas: 10 · Haz clic en un número descubierto con sus banderas completas para desbloquear alrededor.</p>
-                <div class="game-toolbar">
-                    <button class="btn-editorial active diff-btn" data-size="8" data-mines="10">8x8 (10)</button>
-                    <button class="btn-editorial diff-btn" data-size="10" data-mines="16">10x10 (16)</button>
-                    <button class="btn-editorial diff-btn" data-size="12" data-mines="24">12x12 (24)</button>
-                </div>
-                <div class="game-toolbar" style="margin-top: 1rem;">
-                    <button id="mode-toggle" class="btn-editorial active">
-                        <span class="btn-icon-svg" id="mode-icon"></span>
-                        <span id="mode-label">Modo: Cavar</span>
-                    </button>
-                    <button id="reset-mines" class="btn-editorial">Nuevo Tablero</button>
-                </div>
-            </div>
-            <div class="board-container">
-                <div class="minesweeper-board" id="minesweeper-board"></div>
-            </div>
+            <div class="minesweeper-board" id="minesweeper-board"></div>
 
             {% elif game_id == 'sudoku' %}
-            <!-- 02. SUDOKU MINIMALISTA -->
-            <div class="lab-description">
-                <h2>{{ game.title }}</h2>
-                <p id="sudoku-status">Selecciona una casilla vacía y elige un número del 1 al 9. Sin anuncios ni límite de tiempo.</p>
-                <div class="sudoku-numpad" id="sudoku-numpad"></div>
-                <div class="game-toolbar" style="margin-top: 1.2rem;">
-                    <button id="sudoku-erase" class="btn-editorial">Borrar Casilla</button>
-                    <button id="sudoku-check" class="btn-editorial active">Verificar Solución</button>
-                    <button id="sudoku-new" class="btn-editorial">Nuevo Tablero</button>
-                </div>
-            </div>
-            <div class="board-container">
+            <div class="sudoku-stage-box">
                 <div class="sudoku-board" id="sudoku-board"></div>
+                <!-- Popover flotante de selección de números (aparece al hacer clic en una celda) -->
+                <div class="sudoku-popover" id="sudoku-popover" hidden>
+                    <div class="popover-grid" id="popover-numbers"></div>
+                </div>
             </div>
 
             {% elif game_id == 'solitario' %}
-            <!-- 03. SOLITARIO KLONDIKE -->
-            <div class="lab-description" style="grid-column: 1 / -1;">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-                    <div>
-                        <h2>{{ game.title }}</h2>
-                        <p id="solitaire-status">Haz clic en una carta para seleccionarla y luego en la columna o pila de destino. Los Ases suben a las 4 bases con doble clic.</p>
-                    </div>
-                    <div class="game-toolbar">
-                        <button id="solitaire-new" class="btn-editorial active">Repartir Nueva Partida</button>
-                    </div>
-                </div>
-                <div class="solitaire-table" id="solitaire-table"></div>
-            </div>
+            <div class="solitaire-table" id="solitaire-table"></div>
 
             {% elif game_id == 'tetris' %}
-            <!-- 04. TETRIS CLÁSICO -->
-            <div class="lab-description">
-                <h2>{{ game.title }}</h2>
-                <p id="tetris-status">Usa las flechas del teclado (o los botones táctiles debajo) para rotar y acomodar los bloques.</p>
-                <div class="score-panel">
-                    <span>PUNTOS: <strong id="tetris-score">0</strong></span>
-                    <span>LÍNEAS: <strong id="tetris-lines">0</strong></span>
-                </div>
-                <div class="game-toolbar" style="margin-top: 1rem;">
-                    <button class="btn-editorial" data-tctrl="left">← Izq</button>
-                    <button class="btn-editorial active" data-tctrl="rotate">Rotar ↻</button>
-                    <button class="btn-editorial" data-tctrl="right">Der →</button>
-                    <button class="btn-editorial" data-tctrl="down">Bajar ↓</button>
-                    <button class="btn-editorial" data-tctrl="drop">Caída Instantánea</button>
-                </div>
-                <div class="game-toolbar" style="margin-top: 0.8rem;">
-                    <button id="tetris-reset" class="btn-editorial">Reiniciar Partida</button>
-                </div>
-            </div>
-            <div class="board-container">
-                <canvas id="tetris-canvas" width="260" height="520" class="arcade-canvas"></canvas>
-            </div>
+            <canvas id="tetris-canvas" width="300" height="600" class="arcade-canvas"></canvas>
 
             {% elif game_id == '2048' %}
-            <!-- 05. 2048 BOTÁNICO -->
-            <div class="lab-description">
-                <h2>{{ game.title }}</h2>
-                <p id="g2048-status">Usa las flechas del teclado o los controles para deslizar y fusionar potencias de 2 hasta llegar a 2048.</p>
-                <div class="score-panel">
-                    <span>PUNTUACIÓN: <strong id="g2048-score">0</strong></span>
-                </div>
-                <div class="game-toolbar" style="margin-top: 1rem;">
-                    <button class="btn-editorial" data-dir="left">←</button>
-                    <button class="btn-editorial" data-dir="up">↑</button>
-                    <button class="btn-editorial" data-dir="down">↓</button>
-                    <button class="btn-editorial" data-dir="right">→</button>
-                    <button id="g2048-reset" class="btn-editorial active">Reiniciar</button>
-                </div>
-            </div>
-            <div class="board-container">
-                <div class="board-2048" id="board-2048"></div>
-            </div>
+            <div class="board-2048" id="board-2048"></div>
 
             {% elif game_id == 'snake' %}
-            <!-- 06. SNAKE RETRO -->
-            <div class="lab-description">
-                <h2>{{ game.title }}</h2>
-                <p id="snake-status">Usa las flechas del teclado o los botones direccionales. Los bordes son continuos (atraviesas la pared).</p>
-                <div class="score-panel">
-                    <span>LONGITUD: <strong id="snake-score">3</strong></span>
-                    <span>RÉCORD: <strong id="snake-best">3</strong></span>
-                </div>
-                <div class="game-toolbar" style="margin-top: 1rem;">
-                    <button class="btn-editorial" data-sdir="LEFT">←</button>
-                    <button class="btn-editorial" data-sdir="UP">↑</button>
-                    <button class="btn-editorial" data-sdir="DOWN">↓</button>
-                    <button class="btn-editorial" data-sdir="RIGHT">→</button>
-                    <button id="snake-reset" class="btn-editorial active">Nueva Partida</button>
-                </div>
-            </div>
-            <div class="board-container">
-                <canvas id="snake-canvas" width="360" height="360" class="arcade-canvas"></canvas>
-            </div>
+            <canvas id="snake-canvas" width="420" height="420" class="arcade-canvas"></canvas>
             {% endif %}
 
+            <!-- OVERLAY FLOTANTE DE VICTORIA / FIN DE PARTIDA (ENCIMA DEL TABLERO) -->
+            <div class="game-overlay" id="game-overlay" hidden>
+                <div class="overlay-card">
+                    <span class="pill-tag" id="overlay-badge">Partida Terminada</span>
+                    <h2 id="overlay-title">Resultado</h2>
+                    <p id="overlay-message">Has completado la ronda.</p>
+                    <button id="overlay-restart-btn" class="btn-editorial active">Jugar Nuevo Tablero</button>
+                </div>
+            </div>
+
         </div>
+
+        <p class="game-gesture-hint" id="gesture-hint">
+            {% if game_id == 'buscaminas' %}
+            Toca una casilla para cavar o marca banderas. Toca un número resuelto para despejar sus vecinas.
+            {% elif game_id == 'sudoku' %}
+            Toca cualquier casilla vacía para abrir el selector flotante de números o escribe con el teclado.
+            {% elif game_id == 'solitario' %}
+            Arrastra las cartas con el dedo o el ratón hacia otra columna o base, o haz doble toque para moverlas.
+            {% elif game_id == 'tetris' %}
+            Desliza a los lados para mover, toca el tablero para rotar y desliza hacia abajo para soltar la pieza.
+            {% elif game_id == '2048' %}
+            Desliza en cualquier dirección directamente sobre el tablero o usa las teclas direccionales.
+            {% elif game_id == 'snake' %}
+            Desliza sobre el tablero para cambiar de dirección o usa las teclas direccionales.
+            {% endif %}
+        </p>
     </main>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

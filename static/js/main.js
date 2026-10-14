@@ -123,7 +123,7 @@ const statusEl = document.getElementById('mine-status');
 const modeBtn = document.getElementById('mode-toggle');
 const modeIcon = document.getElementById('mode-icon');
 const modeLabel = document.getElementById('mode-label');
-const resetBtn = document.getElementById('reset-mines');
+const resetBtn = document.getElementById('reset-mines') || document.getElementById('universal-reset-btn');
 
 let flagMode = false;
 let firstClick = true;
@@ -502,11 +502,35 @@ document.querySelectorAll('.multi-exp-canvas').forEach(canvas => {
    ============================================================================ */
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const feedback = document.getElementById('form-feedback');
-        feedback.textContent = 'Mensaje registrado correctamente. Me pondré en contacto contigo pronto.';
-        contactForm.reset();
+        const submitBtn = document.getElementById('submit-btn');
+        const payload = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            message: document.getElementById('message').value
+        };
+        submitBtn.disabled = true;
+        feedback.textContent = 'Enviando mensaje...';
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok && data.ok) {
+                feedback.textContent = 'Mensaje guardado correctamente. Me pondré en contacto contigo pronto.';
+                contactForm.reset();
+            } else {
+                feedback.textContent = data.error || 'No se pudo enviar el mensaje.';
+            }
+        } catch (err) {
+            feedback.textContent = 'Error de conexión al guardar el mensaje.';
+        } finally {
+            submitBtn.disabled = false;
+        }
     });
 }
 

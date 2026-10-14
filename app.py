@@ -2,47 +2,65 @@
 ===============================================================================
 ARCHIVO PRINCIPAL DE SERVIDOR: app.py
 ===============================================================================
-PROPÓSITO:
-Controla las rutas principales del portafolio, el laboratorio de experimentos,
-el sistema de aplicaciones web progresivas (PWA) individuales para cada juego
-del Arcade y el Webhook de despliegue automático desde GitHub hacia PythonAnywhere.
-
-GUÍA RÁPIDA DE MANTENIMIENTO:
-1. ¿Cómo agregar un nuevo juego al Arcade?
-   - Solo agrega una nueva clave al diccionario `GAMES` (abajo).
-   - Automáticamente se creará su tarjeta en `/arcade`, su ruta `/arcade/<id>/`,
-     su `manifest.json` independiente, su Service Worker y su ícono vectorial.
-2. ¿Cómo agregar una nueva página HTML al sitio?
-   - Crea el archivo en `templates/nombre.html` y añade una función `@app.route('/ruta')`.
+Incluye base de datos SQLite (portfolio.db) para almacenar:
+1. Mensajes del formulario de contacto (tabla `messages`).
+2. Récords históricos de cada juego del Arcade (tabla `game_scores`).
 ===============================================================================
 """
 
 import os
+import sqlite3
 import subprocess
 from flask import Flask, render_template, send_from_directory, request, abort, jsonify, Response
 
 app = Flask(__name__)
 
-# Configuración de rutas absolutas en el servidor PythonAnywhere
 REPO_PATH = '/home/viscayaleonardo/personal_web'
 WSGI_FILE = '/var/www/viscayaleonardo_pythonanywhere_com_wsgi.py'
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'portfolio.db')
+
 
 # =============================================================================
-# CATÁLOGO CENTRAL DEL ARCADE (FUENTE DE VERDAD)
+# INICIALIZACIÓN Y CONEXIÓN A BASE DE DATOS SQLITE
 # =============================================================================
-# Estructura de cada cartucho:
-# - number: Número de serie que se muestra en la esquina superior de la tarjeta.
-# - title: Nombre completo del juego (se usa en la vista y al instalar la PWA).
-# - short_name: Nombre corto que aparece debajo del ícono en la pantalla del celular.
-# - status: Etiqueta de estado ('DISPONIBLE' o 'EN DESARROLLO').
-# - description: Resumen técnico del juego que se muestra en el catálogo.
-# - svg_path: Trazo vectorial SVG exclusivo que se dibuja en el ícono de la App.
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    with get_db() as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS game_scores (
+                game_id TEXT PRIMARY KEY,
+                best_score INTEGER NOT NULL DEFAULT 0,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+
+init_db()
+
+
+# =============================================================================
+# CATÁLOGO CENTRAL DEL ARCADE
+# =============================================================================
 GAMES = {
     'buscaminas': {
         'number': '01',
         'title': 'Buscaminas Botánico',
         'short_name': 'Buscaminas',
         'status': 'DISPONIBLE',
+        'score_label': 'VICTORIAS',
         'description': 'Versión táctil con banderas vectoriales, primer clic garantizado sin mina, despeje rápido (chording) y tres tamaños de tablero.',
         'svg_path': '<path d="M190 130v252M190 140l160 65-160 65" fill="#588157" stroke="#dad7cd" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>'
     },
@@ -51,7 +69,8 @@ GAMES = {
         'title': 'Sudoku Minimalista',
         'short_name': 'Sudoku',
         'status': 'DISPONIBLE',
-        'description': 'Tableros generados matemáticamente con solución única, modo de anotaciones por casilla y guardado automático en memoria local.',
+        'score_label': 'RESUELTOS',
+        'description': 'Tableros con selector numérico emergente al tocar cada casilla, iluminación de ejes y validación instantánea.',
         'svg_path': '<path d="M140 215h232M140 297h232M215 140v232M297 140v232" stroke="#dad7cd" stroke-width="20" stroke-linecap="round"/>'
     },
     'solitario': {
@@ -59,7 +78,8 @@ GAMES = {
         'title': 'Solitario Klondike',
         'short_name': 'Solitario',
         'status': 'DISPONIBLE',
-        'description': 'Baraja vectorial de alto contraste con arrastre fluido, autocompletado inteligente al despejar columnas y cero cortes publicitarios.',
+        'score_label': 'VICTORIAS',
+        'description': 'Baraja con arrastre libre (Drag & Drop táctil y con ratón), apilamiento en cascada y auto-envío con doble toque.',
         'svg_path': '<rect x="175" y="135" width="162" height="242" rx="22" fill="#588157" stroke="#dad7cd" stroke-width="20"/><circle cx="256" cy="256" r="34" fill="#dad7cd"/>'
     },
     'tetris': {
@@ -67,7 +87,8 @@ GAMES = {
         'title': 'Tetris Clásico',
         'short_name': 'Tetris',
         'status': 'DISPONIBLE',
-        'description': 'Motor de caída de tetrominós con pieza fantasma de guía, retención de ficha (hold), controles táctiles precisos y tabla de récords.',
+        'score_label': 'RÉCORD PTS',
+        'description': 'Lienzo central maximizado con pieza fantasma de guía, gestos táctiles de deslizamiento y rotación con un toque.',
         'svg_path': '<path d="M160 220h192v64H160zM224 156h64v64h-64z" fill="#588157" stroke="#dad7cd" stroke-width="18" stroke-linejoin="round"/>'
     },
     '2048': {
@@ -75,7 +96,8 @@ GAMES = {
         'title': '2048 Botánico',
         'short_name': '2048',
         'status': 'DISPONIBLE',
-        'description': 'Rompecabezas numérico de deslizamiento sobre matriz 4x4 con transiciones suaves en CSS, botón de deshacer movimiento y guardado de sesión.',
+        'score_label': 'RÉCORD PTS',
+        'description': 'Matriz 4x4 centrada de gran formato controlada directamente deslizando el dedo sobre el tablero o con el teclado.',
         'svg_path': '<rect x="150" y="150" width="95" height="95" rx="16" fill="#588157" stroke="#dad7cd" stroke-width="16"/><rect x="267" y="267" width="95" height="95" rx="16" fill="#a3b18a" stroke="#dad7cd" stroke-width="16"/>'
     },
     'snake': {
@@ -83,37 +105,73 @@ GAMES = {
         'title': 'Snake Retro',
         'short_name': 'Snake',
         'status': 'DISPONIBLE',
-        'description': 'El clásico de Nokia reconstruido en lienzo limpio con velocidad progresiva, gestos de deslizamiento en móvil y modo sin bordes.',
+        'score_label': 'MÁX LONGITUD',
+        'description': 'Lienzo maximizado controlado por gestos de deslizamiento directo en pantalla o teclado, con bordes continuos.',
         'svg_path': '<path d="M150 320h110V200h102" fill="none" stroke="#dad7cd" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/><circle cx="362" cy="145" r="18" fill="#a3b18a"/>'
     }
 }
 
+
 # =============================================================================
-# RUTAS DE VISTAS PRINCIPALES
+# RUTAS DE VISTAS Y API SQLITE (MENSAJES Y RÉCORDS)
 # =============================================================================
 @app.route('/')
 def index():
-    """Renderiza la portada principal con Proyectos, Demo de Buscaminas, Sandbox y Contacto."""
     return render_template('index.html')
 
 @app.route('/arcade')
 def arcade():
-    """Renderiza el catálogo completo iterando sobre el diccionario GAMES."""
     return render_template('arcade.html', games=GAMES)
 
 @app.route('/experimentos')
 def experimentos():
-    """Renderiza la página dedicada a las simulaciones físicas en formato scroll."""
     return render_template('experimentos.html')
 
+@app.route('/api/contact', methods=['POST'])
+def api_contact():
+    """Guarda un mensaje del formulario de contacto en la tabla SQLite `messages`."""
+    data = request.get_json(silent=True) or request.form
+    name = (data.get('name') or '').strip()
+    email = (data.get('email') or '').strip()
+    message = (data.get('message') or '').strip()
+    if not name or not email or not message:
+        return jsonify({'ok': False, 'error': 'Todos los campos son obligatorios.'}), 400
+    with get_db() as conn:
+        conn.execute(
+            'INSERT INTO messages (name, email, message) VALUES (?, ?, ?)',
+            (name, email, message)
+        )
+        conn.commit()
+    return jsonify({'ok': True, 'message': 'Mensaje guardado correctamente en la base de datos.'})
+
+@app.route('/api/scores/<game_id>', methods=['GET', 'POST'])
+def api_scores(game_id):
+    """Obtiene o actualiza el récord histórico de un juego en SQLite."""
+    if game_id not in GAMES:
+        abort(404)
+    with get_db() as conn:
+        row = conn.execute('SELECT best_score FROM game_scores WHERE game_id = ?', (game_id,)).fetchone()
+        current_best = row['best_score'] if row else 0
+
+        if request.method == 'POST':
+            data = request.get_json(silent=True) or {}
+            new_score = int(data.get('score', 0))
+            if new_score > current_best:
+                current_best = new_score
+                conn.execute('''
+                    INSERT INTO game_scores (game_id, best_score, updated_at)
+                    VALUES (?, ?, CURRENT_TIMESTAMP)
+                    ON CONFLICT(game_id) DO UPDATE SET
+                        best_score = excluded.best_score,
+                        updated_at = CURRENT_TIMESTAMP
+                ''', (game_id, current_best))
+                conn.commit()
+        return jsonify({'game_id': game_id, 'best_score': current_best})
+
 
 # =============================================================================
-# ARQUITECTURA PWA INDIVIDUAL POR JUEGO (/arcade/<game_id>/)
+# RUTAS PWA POR JUEGO Y WEBHOOK DE AUTO-DEPLOY
 # =============================================================================
-# IMPORTANTE: La barra final '/' en '/arcade/<game_id>/' es obligatoria para que
-# el navegador reconozca esa subcarpeta como un "scope" aislado y permita
-# instalar cada juego como una aplicación independiente en el teléfono o PC.
-
 @app.route('/arcade/<game_id>/')
 def play_game(game_id):
     if game_id not in GAMES:
@@ -122,7 +180,6 @@ def play_game(game_id):
 
 @app.route('/arcade/<game_id>/manifest.json')
 def game_manifest(game_id):
-    """Genera dinámicamente el archivo manifest.json exclusivo para el juego solicitado."""
     if game_id not in GAMES:
         abort(404)
     game = GAMES[game_id]
@@ -146,13 +203,12 @@ def game_manifest(game_id):
         ]
     })
 
-# En app.py, dentro de game_sw(game_id), actualiza la función así (con estrategia Network-First):
 @app.route('/arcade/<game_id>/sw.js')
 def game_sw(game_id):
     if game_id not in GAMES:
         abort(404)
     sw_code = f"""
-    const CACHE_NAME = 'pwa-game-{game_id}-v3';
+    const CACHE_NAME = 'pwa-game-{game_id}-v4';
     const URLS = [
         '/arcade/{game_id}/',
         '/static/css/style.css',
@@ -168,8 +224,8 @@ def game_sw(game_id):
     self.addEventListener('activate', e => {{
         e.waitUntil(clients.claim());
     }});
-    // Network-First: Si hay internet baja lo más nuevo; si estás offline usa la caché
     self.addEventListener('fetch', e => {{
+        if (e.request.method !== 'GET') return;
         e.respondWith(
             fetch(e.request).then(res => {{
                 const copy = res.clone();
@@ -180,9 +236,9 @@ def game_sw(game_id):
     }});
     """
     return Response(sw_code, mimetype='application/javascript')
+
 @app.route('/arcade/<game_id>/icon.svg')
 def game_icon(game_id):
-    """Renderiza el ícono vectorial de la aplicación usando el trazo definido en GAMES."""
     if game_id not in GAMES:
         abort(404)
     svg_inner = GAMES[game_id]['svg_path']
@@ -193,10 +249,6 @@ def game_icon(game_id):
     </svg>"""
     return Response(svg, mimetype='image/svg+xml')
 
-
-# =============================================================================
-# SERVICE WORKER GENERAL Y WEBHOOK DE AUTO-DEPLOY
-# =============================================================================
 @app.route('/sw.js')
 def service_worker():
     return send_from_directory('static', 'sw.js', mimetype='application/javascript')
@@ -207,11 +259,6 @@ def manifest():
 
 @app.route('/update_server', methods=['POST'])
 def webhook():
-    """
-    Endpoint invocado automáticamente por GitHub Webhooks al hacer 'git push'.
-    Descarga la rama 'main', fuerza la sincronización limpia y actualiza la marca
-    de tiempo del archivo WSGI para reiniciar el servidor de PythonAnywhere.
-    """
     if request.method == 'POST':
         try:
             subprocess.run(['git', '-C', REPO_PATH, 'fetch', '--all'], check=True)
