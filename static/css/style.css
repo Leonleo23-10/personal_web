@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. TU PALETA EXACTA + TEMA CLARO / OSCURO EDITORIAL
+   1. PALETA BOTÁNICA EXACTA
    ========================================================================== */
 :root {
     --dust-grey: #dad7cdff;
@@ -8,7 +8,6 @@
     --hunter-green: #3a5a40ff;
     --pine-teal: #344e41ff;
 
-    /* Modo por defecto: Papel Dust Grey con tinta Pine Teal */
     --bg-primary: var(--dust-grey);
     --bg-secondary: #cfccc0;
     --text-primary: var(--pine-teal);
@@ -19,7 +18,6 @@
 }
 
 :root[data-mode="dark"] {
-    /* Modo invertido: Fondo Pine Teal profundo con letras Dust Grey */
     --bg-primary: var(--pine-teal);
     --bg-secondary: var(--hunter-green);
     --text-primary: var(--dust-grey);
@@ -29,9 +27,6 @@
     --border-line: rgba(218, 215, 205, 0.18);
 }
 
-/* ==========================================================================
-   2. BASE & SCROLL FLUIDO
-   ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -46,18 +41,17 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
-    line-height: 1.45;
+    line-height: 1.5;
     overflow-x: hidden;
-    transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-color 0.45s ease, color 0.45s ease;
 }
 
-/* Cursor circular que sigue al mouse (estilo Awwwards) */
+/* Cursor personalizado */
 .custom-cursor {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border: 1.5px solid var(--fern);
-    background: rgba(88, 129, 87, 0.15);
+    background: rgba(88, 129, 87, 0.14);
     border-radius: 50%;
     position: fixed;
     top: 0;
@@ -69,30 +63,30 @@ body {
 }
 
 .custom-cursor.hovered {
-    width: 48px;
-    height: 48px;
-    background: rgba(88, 129, 87, 0.28);
+    width: 44px;
+    height: 44px;
+    background: rgba(88, 129, 87, 0.26);
 }
 
 /* ==========================================================================
-   3. NAVEGACIÓN FLOTANTE ESTILO "BELLO."
+   2. NAVEGACIÓN SUPERIOR
    ========================================================================== */
 .nav-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.8rem 4vw;
+    padding: 1.5rem 4vw;
     position: sticky;
     top: 0;
     z-index: 100;
     backdrop-filter: blur(10px);
-    background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+    background: color-mix(in srgb, var(--bg-primary) 86%, transparent);
     border-bottom: 1px solid var(--border-line);
 }
 
 .brand {
     font-family: 'Syne', sans-serif;
-    font-size: 1.75rem;
+    font-size: 1.65rem;
     font-weight: 800;
     color: var(--text-primary);
     text-decoration: none;
@@ -108,18 +102,19 @@ body {
     border-radius: 999px;
     border: 1px solid var(--border-line);
     gap: 4px;
+    flex-wrap: wrap;
 }
 
 .mode-pill {
     border: none;
     background: transparent;
     color: var(--text-primary);
-    padding: 0.45rem 1.1rem;
+    padding: 0.45rem 1rem;
     border-radius: 999px;
     font-weight: 600;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 
 .mode-pill.active, .mode-pill:hover {
@@ -130,16 +125,16 @@ body {
 .nav-link {
     color: var(--text-primary);
     text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 0.88rem;
 }
 
 /* ==========================================================================
-   4. HERO EDITORIAL MONUMENTAL
+   3. HERO EDITORIAL
    ========================================================================== */
 .hero-section {
     padding: 6vw 4vw 5vw;
-    min-height: 82vh;
+    min-height: 80vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -149,7 +144,7 @@ body {
 .hero-meta, .section-header, .footer-top, .footer-bottom {
     display: flex;
     justify-content: space-between;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     color: var(--text-secondary);
@@ -158,7 +153,7 @@ body {
 
 .display-title {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(2.4rem, 6.2vw, 6.4rem);
+    font-size: clamp(2.3rem, 5.8vw, 6rem);
     font-weight: 800;
     line-height: 0.98;
     letter-spacing: -0.03em;
@@ -169,12 +164,9 @@ body {
 .italic-accent {
     color: var(--fern);
     font-style: italic;
-    font-weight: 700;
 }
 
-.amp {
-    color: var(--dry-sage);
-}
+.amp { color: var(--dry-sage); }
 
 .hero-bottom {
     display: flex;
@@ -184,22 +176,22 @@ body {
 }
 
 .hero-bio {
-    max-width: 440px;
-    font-size: 1.05rem;
+    max-width: 480px;
+    font-size: 1.02rem;
     color: var(--text-secondary);
 }
 
 .scroll-indicator {
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     letter-spacing: 0.1em;
     color: var(--fern);
 }
 
 /* ==========================================================================
-   5. LISTA DE PROYECTOS INTERACTIVA (ESTILO MIJOBELLO)
+   4. PROYECTOS CON ACORDEÓN DESPLEGABLE
    ========================================================================== */
-.works-section, .lab-section {
+.works-section, .lab-section, .experiments-section {
     padding: 6vw 4vw;
     border-bottom: 1px solid var(--border-line);
 }
@@ -209,17 +201,18 @@ body {
     border-top: 1px solid var(--border-line);
 }
 
+.work-item {
+    border-bottom: 1px solid var(--border-line);
+}
+
 .work-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2.4rem 1rem;
-    border-bottom: 1px solid var(--border-line);
-    text-decoration: none;
+    padding: 2.2rem 1rem;
+    cursor: pointer;
     color: var(--text-primary);
-    position: relative;
-    transition: padding 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                background-color 0.35s ease;
+    transition: padding 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
 }
 
 .work-left {
@@ -236,60 +229,116 @@ body {
 
 .work-title {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(1.6rem, 3.5vw, 3.2rem);
+    font-size: clamp(1.5rem, 3.2vw, 2.9rem);
     font-weight: 700;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .work-right {
     display: flex;
     align-items: center;
     gap: 2rem;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: var(--text-secondary);
 }
 
-.work-arrow {
-    font-size: 1.5rem;
+.work-toggle-icon {
+    font-size: 1.6rem;
+    font-weight: 400;
     transition: transform 0.35s ease;
 }
 
-/* Micro-interacción al pasar el cursor sobre cada fila */
 .work-row:hover {
-    background-color: color-mix(in srgb, var(--dry-sage) 22%, transparent);
-    padding-left: 2.2rem;
-    padding-right: 2.2rem;
+    background-color: color-mix(in srgb, var(--dry-sage) 20%, transparent);
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
 .work-row:hover .work-title {
-    transform: translateX(12px);
-    color: var(--hunter-green);
+    transform: translateX(10px);
 }
 
-:root[data-mode="dark"] .work-row:hover .work-title {
-    color: var(--dry-sage);
-}
-
-.work-row:hover .work-arrow {
-    transform: translate(5px, -5px);
+/* Estado Abierto del Proyecto */
+.work-item.open .work-toggle-icon {
+    transform: rotate(45deg);
     color: var(--fern);
 }
 
-/* Etiqueta flotante que sigue al cursor al inspeccionar un proyecto */
+.work-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: color-mix(in srgb, var(--bg-secondary) 55%, transparent);
+}
+
+.work-item.open .work-details {
+    max-height: 520px;
+}
+
+.work-details-inner {
+    padding: 2.2rem 2rem 2.6rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2.5rem;
+    border-top: 1px dashed var(--border-line);
+}
+
+.detail-col h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--fern);
+    margin-bottom: 0.75rem;
+}
+
+.detail-col p {
+    font-size: 0.94rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.4rem;
+}
+
+.tech-tags span {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-line);
+    padding: 0.25rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.project-link {
+    display: inline-block;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--fern);
+    padding-bottom: 2px;
+}
+
+/* Etiqueta flotante del cursor */
 .floating-preview {
     position: fixed;
     pointer-events: none;
     z-index: 900;
     background: var(--pine-teal);
     color: var(--dust-grey);
-    padding: 0.65rem 1.2rem;
+    padding: 0.55rem 1.1rem;
     border-radius: 999px;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 600;
     border: 1px solid var(--dry-sage);
     opacity: 0;
-    transform: translate(-50%, -140%) scale(0.85);
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transform: translate(-50%, -140%) scale(0.9);
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .floating-preview.visible {
@@ -298,7 +347,7 @@ body {
 }
 
 /* ==========================================================================
-   6. SECCIÓN ARCADE / BUSCAMINAS BOTÁNICO
+   5. ARCADE Y TABLERO DE BUSCAMINAS
    ========================================================================== */
 .lab-showcase {
     margin-top: 3.5rem;
@@ -313,22 +362,22 @@ body {
     background: var(--dry-sage);
     color: var(--pine-teal);
     font-weight: 700;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     padding: 0.35rem 0.9rem;
     border-radius: 999px;
     margin-bottom: 1.2rem;
 }
 
-.lab-description h2 {
+.lab-description h2, .experiment-sidebar h2 {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-size: clamp(1.7rem, 2.8vw, 2.6rem);
     margin-bottom: 1rem;
 }
 
-.lab-description p {
+.lab-description p, .experiment-sidebar p {
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
-    max-width: 50ch;
+    max-width: 52ch;
 }
 
 .game-toolbar {
@@ -342,10 +391,11 @@ body {
     border: 1px solid var(--hunter-green);
     background: var(--bg-secondary);
     color: var(--text-primary);
-    padding: 0.7rem 1.25rem;
+    padding: 0.7rem 1.2rem;
     border-radius: 999px;
     font-weight: 600;
-    font-size: 0.86rem;
+    font-size: 0.84rem;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.25s ease;
 }
@@ -368,46 +418,143 @@ body {
 
 .minesweeper-board {
     display: grid;
-    grid-template-columns: repeat(8, minmax(34px, 44px));
-    grid-template-rows: repeat(8, minmax(34px, 44px));
-    gap: 6px;
+    grid-template-columns: repeat(8, minmax(34px, 42px));
+    gap: 5px;
     background: var(--pine-teal);
     padding: 14px;
-    border-radius: 20px;
+    border-radius: 18px;
     box-shadow: 0 20px 40px -15px rgba(52, 78, 65, 0.35);
 }
 
 .mine-cell {
+    aspect-ratio: 1 / 1;
     background: var(--dry-sage);
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--pine-teal);
     cursor: pointer;
-    transition: transform 0.15s ease, background-color 0.2s ease;
+    transition: transform 0.12s ease, background-color 0.2s ease;
 }
 
 .mine-cell:hover {
     background: var(--fern);
     color: var(--dust-grey);
-    transform: scale(1.06);
 }
 
 .mine-cell.revealed {
     background: var(--dust-grey);
     color: var(--pine-teal);
-    cursor: default;
-    transform: none;
 }
 
-.mine-cell.boom {
-    background: #b54845;
+.mine-cell.flagged {
+    background: var(--hunter-green);
     color: var(--dust-grey);
 }
 
+.mine-cell.boom {
+    background: #9e3a37;
+    color: var(--dust-grey);
+}
+
+/* Tarjetas del Hub Arcade (/arcade) */
+.arcade-hub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.arcade-hub-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-line);
+    border-radius: 20px;
+    padding: 2rem;
+}
+
+.arcade-hub-card h2 {
+    font-family: 'Syne', sans-serif;
+    margin: 1rem 0 0.6rem;
+}
+
 /* ==========================================================================
-   7. FOOTER EDITORIAL
+   6. SECCIÓN 03: MINI EXPERIMENTOS (CANVAS INTERACTIVO)
+   ========================================================================== */
+.experiment-wrapper {
+    margin-top: 3.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 4vw;
+    align-items: stretch;
+}
+
+.exp-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+}
+
+.exp-btn {
+    text-align: left;
+    padding: 0.85rem 1.1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-line);
+    color: var(--text-primary);
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.exp-btn.active, .exp-btn:hover {
+    background: var(--hunter-green);
+    color: var(--dust-grey);
+}
+
+.exp-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.exp-controls label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.exp-controls input[type="range"] {
+    accent-color: var(--hunter-green);
+}
+
+.experiment-canvas-box {
+    background: var(--pine-teal);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+}
+
+#experiment-canvas {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    display: block;
+    cursor: crosshair;
+}
+
+.canvas-caption {
+    background: rgba(26, 40, 33, 0.75);
+    color: var(--dust-grey);
+    padding: 0.65rem 1.2rem;
+    font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   7. SECCIÓN 04: FOOTER Y CONTACTO
    ========================================================================== */
 .footer-section {
     padding: 6vw 4vw 3vw;
@@ -419,15 +566,114 @@ body {
     color: var(--dry-sage);
 }
 
-.footer-cta {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(2.2rem, 5.5vw, 5.5rem);
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 4vw;
     margin: 3.5rem 0;
-    line-height: 1;
+    align-items: start;
 }
 
-@media (max-width: 860px) {
-    .lab-showcase { grid-template-columns: 1fr; }
-    .work-row { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
-    .custom-cursor, .floating-preview { display: none; }
+.footer-cta {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 4.8vw, 4.6rem);
+    line-height: 1;
+    margin-bottom: 1.2rem;
+}
+
+.contact-sub {
+    color: var(--dry-sage);
+    max-width: 44ch;
+    margin-bottom: 2rem;
+}
+
+.direct-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.contact-pill {
+    color: var(--dust-grey);
+    border: 1px solid var(--dry-sage);
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.contact-pill:hover {
+    background: var(--dry-sage);
+    color: var(--pine-teal);
+}
+
+.contact-form {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(163, 177, 138, 0.25);
+    padding: 2rem;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dry-sage);
+}
+
+.form-group input, .form-group textarea {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(163, 177, 138, 0.35);
+    color: var(--dust-grey);
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--dry-sage);
+}
+
+.btn-submit {
+    background: var(--dry-sage);
+    color: var(--pine-teal);
+    border: none;
+    padding: 0.9rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.25s ease;
+}
+
+.btn-submit:hover {
+    background: var(--dust-grey);
+}
+
+.form-feedback {
+    font-size: 0.85rem;
+    color: var(--dry-sage);
+}
+
+@media (max-width: 900px) {
+    .work-details-inner, .lab-showcase, .experiment-wrapper, .contact-grid, .arcade-hub-grid {
+        grid-template-columns: 1fr;
+    }
+    .work-item.open .work-details {
+        max-height: 900px;
+    }
+    .custom-cursor, .floating-preview {
+        display: none;
+    }
 }

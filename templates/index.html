@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leonardo — Dev & Lab</title>
+    <title>Leonardo Viscaya — Desarrollo & Laboratorio</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#344e41">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,129 +12,257 @@
 </head>
 <body>
 
-    <!-- Cursor personalizado estilo Awwwards -->
     <div class="custom-cursor" id="custom-cursor"></div>
 
-    <!-- Vista previa flotante que sigue al cursor en la lista de proyectos -->
     <div class="floating-preview" id="floating-preview">
-        <span id="preview-tag">Arquitectura Full-Stack</span>
+        <span id="preview-tag">Ver caso de estudio</span>
     </div>
 
-    <!-- NAVEGACIÓN MINIMALISTA ESTILO BELLO. -->
     <header class="nav-header">
-        <a href="#" class="brand">leo<span class="dot">.</span></a>
+        <a href="/" class="brand">leo<span class="dot">.</span></a>
         
-        <div class="mode-switch-wrapper">
-            <button class="mode-pill active" data-target="work">Proyectos</button>
-            <button class="mode-pill" data-target="arcade">Arcade</button>
-            <button class="mode-pill" data-target="theme" id="theme-toggle" title="Dark mode">◐</button>
-        </div>
+        <nav class="mode-switch-wrapper">
+            <button class="mode-pill active" data-target="#proyectos">Proyectos</button>
+            <button class="mode-pill" data-target="#arcade">Arcade</button>
+            <button class="mode-pill" data-target="#experimentos">Experimentos</button>
+            <button class="mode-pill" data-target="#contacto">Contacto</button>
+            <button class="mode-pill" id="theme-toggle" title="Cambiar contraste">Tema</button>
+        </nav>
 
-        <a href="#contacto" class="nav-link magnetic">Disponible para proyectos ↗</a>
+        <a href="/arcade" class="nav-link">Ir al Arcade PWA -></a>
     </header>
 
     <main>
-        <!-- SECCIÓN 1: HERO EDITORIAL MONUMENTAL -->
+        <!-- HERO EDITORIAL -->
         <section class="hero-section">
             <div class="hero-meta">
-                <span>DESARROLLADOR WEB & FÍSICA</span>
-                <span>CDMX // MÉXICO</span>
+                <span>DESARROLLO DE SOFTWARE & FÍSICA</span>
+                <span>CIUDAD DE MÉXICO</span>
             </div>
             <h1 class="display-title">
-                CREANDO <span class="italic-accent">SOFTWARE</span> SÓLIDO, INTERFACES VIVAS <span class="amp">&</span> EXPERIMENTOS.
+                ARQUITECTURA <span class="italic-accent">WEB</span> SÓLIDA, INTERFACES VIVAS <span class="amp">&</span> SIMULACIÓN.
             </h1>
             <div class="hero-bottom">
                 <p class="hero-bio">
-                    Construyo aplicaciones web completas en Python, Flask y SQL, integrando pasarelas de pago y experiencias interactivas en CSS puro. Sin plantillas genéricas.
+                    Diseño y programo plataformas web completas en Python, Flask y SQL, integrando flujos de pago, sistemas administrativos y experiencias interactivas libres de anuncios.
                 </p>
-                <div class="scroll-indicator">SCROLL ↓</div>
+                <div class="scroll-indicator">DESPLAZAR HACIA ABAJO</div>
             </div>
         </section>
 
-        <!-- SECCIÓN 2: SELECTED WORKS (FILAS INTERACTIVAS ESTILO MIJOBELLO) -->
+        <!-- 01 // PROYECTOS CON DESPLIEGUE DE CASOS DE ESTUDIO -->
         <section class="works-section" id="proyectos">
             <div class="section-header">
-                <span>01 // TRABAJOS SELECCIONADOS</span>
-                <span>(2025 — 2026)</span>
+                <span>01 // PROYECTOS Y ARQUITECTURA</span>
+                <span>HAZ CLIC EN CADA PROYECTO PARA EXPANDIR</span>
             </div>
 
             <div class="work-list">
-                <a href="#proyectos" class="work-row" data-preview="Flask · SQL · Recibos PDF · Video Módulos">
-                    <div class="work-left">
-                        <span class="work-index">01</span>
-                        <h2 class="work-title">Plataforma & Estudio Virtual</h2>
+                <!-- Proyecto 01 -->
+                <article class="work-item">
+                    <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
+                        <div class="work-left">
+                            <span class="work-index">01</span>
+                            <h2 class="work-title">Plataforma & Estudio Virtual</h2>
+                        </div>
+                        <div class="work-right">
+                            <span class="work-role">Full-Stack · Flask & SQL</span>
+                            <span class="work-toggle-icon">+</span>
+                        </div>
                     </div>
-                    <div class="work-right">
-                        <span class="work-role">Full-Stack & Administración</span>
-                        <span class="work-arrow">↗</span>
+                    <div class="work-details">
+                        <div class="work-details-inner">
+                            <div class="detail-col">
+                                <h3>El Problema</h3>
+                                <p>La gestión manual de inscripciones, horarios de clases, control de pagos y entrega de material en video generaba cuellos de botella administrativos y errores en el seguimiento de alumnos.</p>
+                            </div>
+                            <div class="detail-col">
+                                <h3>Solución & Arquitectura</h3>
+                                <p>Se construyó una plataforma centralizada con administración de módulos de certificación, reproductor de lecciones, agendamiento dinámico y generación automatizada de recibos digitales en PDF.</p>
+                            </div>
+                            <div class="detail-col detail-meta">
+                                <h3>Stack Técnico</h3>
+                                <div class="tech-tags">
+                                    <span>Python</span><span>Flask</span><span>SQLite / PostgreSQL</span><span>JavaScript</span><span>HTML/CSS</span>
+                                </div>
+                                <a href="#contacto" class="project-link">Solicitar demostración o ver repositorio -></a>
+                            </div>
+                        </div>
                     </div>
-                </a>
+                </article>
 
-                <a href="#proyectos" class="work-row" data-preview="Stripe Connect · Python · Pujas & Pagos">
-                    <div class="work-left">
-                        <span class="work-index">02</span>
-                        <h2 class="work-title">Bike Fit Marketplace</h2>
+                <!-- Proyecto 02 -->
+                <article class="work-item">
+                    <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
+                        <div class="work-left">
+                            <span class="work-index">02</span>
+                            <h2 class="work-title">Bike Fit Marketplace</h2>
+                        </div>
+                        <div class="work-right">
+                            <span class="work-role">Pagos Divididos · Stripe Connect</span>
+                            <span class="work-toggle-icon">+</span>
+                        </div>
                     </div>
-                    <div class="work-right">
-                        <span class="work-role">Arquitectura & Pagos</span>
-                        <span class="work-arrow">↗</span>
+                    <div class="work-details">
+                        <div class="work-details-inner">
+                            <div class="detail-col">
+                                <h3>El Problema</h3>
+                                <p>Conectar vendedores y compradores en un mercado especializado requería retener fondos de forma segura, gestionar ofertas y dividir comisiones automáticamente sin intervención manual.</p>
+                            </div>
+                            <div class="detail-col">
+                                <h3>Solución & Arquitectura</h3>
+                                <p>Implementación de flujos con Stripe Connect para onboarding de vendedores, cobros divididos en tiempo real y base de datos relacional para el historial de pujas y catálogo.</p>
+                            </div>
+                            <div class="detail-col detail-meta">
+                                <h3>Stack Técnico</h3>
+                                <div class="tech-tags">
+                                    <span>Python</span><span>Stripe API</span><span>Stripe Connect</span><span>SQL</span><span>Flask</span>
+                                </div>
+                                <a href="#contacto" class="project-link">Consultar detalles de implementación -></a>
+                            </div>
+                        </div>
                     </div>
-                </a>
+                </article>
 
-                <a href="#proyectos" class="work-row" data-preview="JavaScript · Interfaz Dinámica · 21 Mesas">
-                    <div class="work-left">
-                        <span class="work-index">03</span>
-                        <h2 class="work-title">Invitaciones dinamicas</h2>
+                <!-- Proyecto 03 -->
+                <article class="work-item">
+                    <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
+                        <div class="work-left">
+                            <span class="work-index">03</span>
+                            <h2 class="work-title">Sistema Interactivo de Asignación</h2>
+                        </div>
+                        <div class="work-right">
+                            <span class="work-role">Frontend Dinámico & Estado</span>
+                            <span class="work-toggle-icon">+</span>
+                        </div>
                     </div>
-                    <div class="work-right">
-                        <span class="work-role">Frontend & Lógica en Vivo</span>
-                        <span class="work-arrow">↗</span>
+                    <div class="work-details">
+                        <div class="work-details-inner">
+                            <div class="detail-col">
+                                <h3>El Problema</h3>
+                                <p>Organizar la distribución espacial y confirmación de cientos de invitados a través de 21 mesas con cupos estrictos en tiempo real desde dispositivos móviles.</p>
+                            </div>
+                            <div class="detail-col">
+                                <h3>Solución & Arquitectura</h3>
+                                <p>Interfaz visual interactiva con búsqueda instantánea de invitados, validación de capacidad por mesa en tiempo real y actualización inmediata del mapa del evento.</p>
+                            </div>
+                            <div class="detail-col detail-meta">
+                                <h3>Stack Técnico</h3>
+                                <div class="tech-tags">
+                                    <span>JavaScript ES6</span><span>CSS Grid / Flexbox</span><span>Flask Backend</span><span>JSON API</span>
+                                </div>
+                                <a href="#contacto" class="project-link">Ver arquitectura del proyecto -></a>
+                            </div>
+                        </div>
                     </div>
-                </a>
+                </article>
             </div>
         </section>
 
-        <!-- SECCIÓN 3: THE FUN / LAB SECTION (ARCADE OFFLINE + FÍSICA) -->
+        <!-- 02 // DEMOSTRACIÓN ARCADE (CON CHORDING Y ENLACE AL HUB PWA) -->
         <section class="lab-section" id="arcade">
             <div class="section-header">
-                <span>02 Arcade</span>
-                <span>100% OFFLINE READY</span>
+                <span>02 // DEMOSTRACIÓN ARCADE SIN ANUNCIOS</span>
+                <span>MODO DEMOSTRACIÓN INTERACTIVO</span>
             </div>
 
             <div class="lab-showcase">
-                <!-- Columna Izquierda: Explicación y controles del Arcade -->
                 <div class="lab-description">
-                    <span class="pill-tag">Juega sin internet ni publicidad</span>
-                    <h2>Buscaminas.</h2>
+                    <span class="pill-tag">Juegos Clásicos · Cero Publicidad</span>
+                    <h2>Buscaminas Táctil con Despeje Rápido.</h2>
                     <p>
-                        Me molestaba descargar juegos clásicos llenos de anuncios invasivos, así que programé mi propia colección optimizada para móvil y escritorio. Puedes jugarlo aquí mismo, instalar esta web como App offline o descargar el cartucho en un solo archivo.
+                        Esta es una demostración en vivo de mi colección de juegos ligeros. Incluye primer clic seguro y despeje rápido: al hacer clic sobre una casilla numérica ya descubierta que tenga sus minas vecinas marcadas con bandera (`F`), se desbloquean automáticamente todas las casillas alrededor.
                     </p>
 
                     <div class="game-toolbar">
-                        <button id="mode-toggle" class="btn-editorial active"> Modo Cavar</button>
-                        <button id="reset-mines" class="btn-editorial">Nuevo Tablero</button>
-                        <button id="download-game" class="btn-editorial btn-outline">⬇ Descargar .HTML Offline</button>
+                        <button id="mode-toggle" class="btn-editorial active">Modo: Cavar</button>
+                        <button id="reset-mines" class="btn-editorial">Reiniciar Tablero</button>
+                        <a href="/arcade" class="btn-editorial btn-outline">Abrir Hub Arcade & Instalar PWA -></a>
                     </div>
-                    <p class="mine-status" id="mine-status">Minas ocultas: 10 · Primer clic siempre seguro.</p>
+                    <p class="mine-status" id="mine-status">Minas: 10 · Haz clic en un número descubierto con sus banderas completas para despejar alrededor.</p>
                 </div>
 
-                <!-- Columna Derecha: Tablero 8x8 real estilizado con tu paleta -->
                 <div class="board-container">
                     <div class="minesweeper-board" id="minesweeper-board"></div>
                 </div>
             </div>
         </section>
+
+        <!-- 03 // MINI EXPERIMENTOS Y SIMULACIONES FÍSICAS -->
+        <section class="experiments-section" id="experimentos">
+            <div class="section-header">
+                <span>03 // MINI EXPERIMENTOS & FÍSICA COMPUTACIONAL</span>
+                <span>LIENZO INTERACTIVO EN TIEMPO REAL</span>
+            </div>
+
+            <div class="experiment-wrapper">
+                <div class="experiment-sidebar">
+                    <span class="pill-tag">Sandbox Matemático</span>
+                    <h2>Laboratorio Visual</h2>
+                    <p>Espacio dedicado a pequeñas simulaciones de física, sistemas dinámicos y experimentos de interfaz programados en JavaScript puro.</p>
+                    
+                    <div class="exp-selector">
+                        <button class="exp-btn active" data-sim="gravity">01. Campo Gravitacional Central</button>
+                        <button class="exp-btn" data-sim="waves">02. Interferencia de Ondas Armónicas</button>
+                    </div>
+
+                    <div class="exp-controls">
+                        <label for="sim-param">Intensidad / Frecuencia del Sistema</label>
+                        <input type="range" id="sim-param" min="10" max="100" value="45">
+                        <button id="sim-reset" class="btn-editorial">Reiniciar Condiciones Iniciales</button>
+                    </div>
+                </div>
+
+                <div class="experiment-canvas-box">
+                    <canvas id="experiment-canvas"></canvas>
+                    <div class="canvas-caption" id="canvas-caption">
+                        Mueve el cursor o toca el lienzo para alterar la posición del atractor gravitacional.
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- FOOTER EDITORIAL GIGANTE -->
+    <!-- 04 // SECCIÓN DE CONTACTO COMPLETA -->
     <footer class="footer-section" id="contacto">
         <div class="footer-top">
-            <span>03 // ¿HABLAMOS?</span>
+            <span>04 // CONTACTO DIRECTO</span>
+            <span>DISPONIBLE PARA DESARROLLO & COLABORACIÓN</span>
         </div>
-        <h2 class="footer-cta">CONSTRUYAMOS ALGO JUNTOS<span class="dot">.</span></h2>
+
+        <div class="contact-grid">
+            <div class="contact-left">
+                <h2 class="footer-cta">INICIEMOS UN PROYECTO<span class="dot">.</span></h2>
+                <p class="contact-sub">
+                    Si buscas desarrollar una aplicación web a medida, integrar pasarelas de pago o colaborar en un proyecto técnico, escríbeme directamente.
+                </p>
+                <div class="direct-links">
+                    <a href="mailto:contacto@viscayaleonardo.com" class="contact-pill">Correo Electrónico -></a>
+                    <a href="https://github.com/Leonleo23-10" target="_blank" rel="noopener" class="contact-pill">GitHub -></a>
+                </div>
+            </div>
+
+            <form class="contact-form" id="contact-form">
+                <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input type="text" id="name" name="name" required placeholder="Tu nombre o empresa">
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" name="email" required placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label for="message">Detalles del proyecto o mensaje</label>
+                    <textarea id="message" name="message" rows="4" required placeholder="Cuéntame brevemente qué necesitas construir..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit" id="submit-btn">Enviar Mensaje</button>
+                <p class="form-feedback" id="form-feedback"></p>
+            </form>
+        </div>
+
         <div class="footer-bottom">
-            <span>© 2026 LEONARDO VISCAYA</span>
-            <span>HOSTED ON PYTHONANYWHERE</span>
+            <span>2026 LEONARDO VISCAYA</span>
+            <span>DESPLEGADO EN PYTHONANYWHERE</span>
         </div>
     </footer>
 
