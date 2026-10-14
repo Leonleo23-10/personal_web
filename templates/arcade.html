@@ -5,9 +5,8 @@ CATÁLOGO DE JUEGOS: templates/arcade.html
 ================================================================================
 CÓMO FUNCIONA:
 Esta plantilla recibe el diccionario `games` desde `app.py` y genera una tarjeta
-por cada cartucho usando un bucle Jinja2 `{% for game_id, game in games.items() %}`.
-No necesitas editar este HTML para añadir un séptimo juego; basta con agregarlo
-en el diccionario `GAMES` de `app.py`.
+por cada cartucho automáticamente. No necesitas editar este HTML para añadir un
+séptimo juego; basta con agregarlo en el diccionario `GAMES` de `app.py`.
 ================================================================================
 -->
 <html lang="es" data-mode="light">
@@ -43,7 +42,6 @@ en el diccionario `GAMES` de `app.py`.
             Cada juego cuenta con su propio contenedor, ícono vectorial y manifiesto aislado. Entra al cartucho que prefieras para jugarlo a pantalla completa o instalarlo como aplicación independiente en tu teléfono o computadora.
         </p>
 
-        <!-- Cuadrícula dinámica alimentada desde el diccionario GAMES de app.py -->
         <div class="arcade-hub-grid">
             {% for game_id, game in games.items() %}
             <article class="arcade-hub-card">
