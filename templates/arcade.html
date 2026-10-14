@@ -1,9 +1,20 @@
 <!DOCTYPE html>
+<!-- 
+================================================================================
+CATÁLOGO DE JUEGOS: templates/arcade.html
+================================================================================
+CÓMO FUNCIONA:
+Esta plantilla recibe el diccionario `games` desde `app.py` y genera una tarjeta
+por cada cartucho usando un bucle Jinja2 `{% for game_id, game in games.items() %}`.
+No necesitas editar este HTML para añadir un séptimo juego; basta con agregarlo
+en el diccionario `GAMES` de `app.py`.
+================================================================================
+-->
 <html lang="es" data-mode="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Arcade — Juegos Instalables Sin Anuncios</title>
+    <title>Catálogo Arcade — 6 Cartuchos Instalables Sin Anuncios</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -21,41 +32,37 @@
 
     <main class="works-section">
         <div class="section-header">
-            <span>CADA JUEGO ES UNA APLICACIÓN INDEPENDIENTE</span>
-            <span>SOPORTE PWA INDIVIDUAL</span>
+            <span>CADA CARTUCHO ES UNA APLICACIÓN WEB PROGRESIVA INDEPENDIENTE</span>
+            <span>6 CARTUCHOS EN CATÁLOGO</span>
         </div>
 
         <h1 class="display-title" style="font-size: clamp(2.2rem, 4.8vw, 4.5rem); margin: 2rem 0;">
             CATÁLOGO <span class="italic-accent">ARCADE</span>.
         </h1>
         <p class="hero-bio" style="max-width: 680px; margin-bottom: 3.5rem;">
-            Cada juego de esta colección tiene su propio contenedor y manifiesto independiente. Entra al juego que quieras para jugarlo a pantalla completa o instalarlo individualmente como aplicación en tu teléfono o computadora.
+            Cada juego cuenta con su propio contenedor, ícono vectorial y manifiesto aislado. Entra al cartucho que prefieras para jugarlo a pantalla completa o instalarlo como aplicación independiente en tu teléfono o computadora.
         </p>
 
+        <!-- Cuadrícula dinámica alimentada desde el diccionario GAMES de app.py -->
         <div class="arcade-hub-grid">
+            {% for game_id, game in games.items() %}
             <article class="arcade-hub-card">
                 <div class="section-header">
-                    <span>JUEGO 01 · DISPONIBLE</span>
-                    <span>PWA LISTA</span>
+                    <span>CARTUCHO {{ game.number }}</span>
+                    <span>{{ game.status }}</span>
                 </div>
-                <h2>Buscaminas Botánico</h2>
-                <p>Versión táctil con banderas vectoriales, primer clic garantizado sin mina, despeje rápido de casillas vecinas y tres tamaños de tablero.</p>
+                <div class="cartridge-header">
+                    <img src="/arcade/{{ game_id }}/icon.svg" alt="Icono de {{ game.title }}" class="cartridge-icon">
+                    <h2>{{ game.title }}</h2>
+                </div>
+                <p>{{ game.description }}</p>
                 <div class="game-toolbar" style="margin-top: 1.5rem;">
-                    <a href="/arcade/buscaminas/" class="btn-editorial active">Abrir & Instalar Buscaminas ↗</a>
+                    <a href="/arcade/{{ game_id }}/" class="btn-editorial {% if game.status == 'DISPONIBLE' %}active{% endif %}">
+                        Abrir & Instalar {{ game.short_name }} ↗
+                    </a>
                 </div>
             </article>
-
-            <article class="arcade-hub-card">
-                <div class="section-header">
-                    <span>JUEGO 02 · PRÓXIMAMENTE</span>
-                    <span>EN DESARROLLO</span>
-                </div>
-                <h2>Sudoku Minimalista</h2>
-                <p>Tableros generados matemáticamente con solución única, modo de anotaciones en esquina y guardado de partida en memoria local.</p>
-                <div class="game-toolbar" style="margin-top: 1.5rem;">
-                    <a href="/arcade/sudoku/" class="btn-editorial">Ver Vista Previa & Instalar ↗</a>
-                </div>
-            </article>
+            {% endfor %}
         </div>
     </main>
 

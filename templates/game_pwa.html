@@ -1,10 +1,21 @@
 <!DOCTYPE html>
+<!-- 
+================================================================================
+CONTENEDOR INDIVIDUAL PWA DE CADA JUEGO: templates/game_pwa.html
+================================================================================
+CÓMO AGREGAR EL MOTOR DE UN JUEGO NUEVO (EJ. TETRIS, SOLITARIO, SUDOKU):
+1. Busca abajo la estructura condicional `{% if game_id == 'buscaminas' %}`.
+2. Cuando termines de programar otro juego (por ejemplo, 'tetris'), añade un
+   bloque `{% elif game_id == 'tetris' %}` con el `<canvas id="tetris-board">`
+   o el contenedor HTML que necesite tu juego.
+3. Cambia su `'status': 'DISPONIBLE'` en `app.py`.
+================================================================================
+-->
 <html lang="es" data-mode="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ game.title }} — App Offline</title>
-    <!-- Manifiesto e ícono exclusivos de este juego -->
     <link rel="manifest" href="/arcade/{{ game_id }}/manifest.json">
     <link rel="icon" type="image/svg+xml" href="/arcade/{{ game_id }}/icon.svg">
     <meta name="theme-color" content="#344e41">
@@ -23,12 +34,13 @@
     </header>
 
     <main class="works-section">
-        {% if game_id == 'buscaminas' %}
         <div class="section-header">
-            <span>APLICACIÓN INDEPENDIENTE SIN ANUNCIOS</span>
+            <span>CARTUCHO {{ game.number }} // APLICACIÓN INDEPENDIENTE SIN ANUNCIOS</span>
             <span id="pwa-status-hint">FUNCIONA 100% OFFLINE</span>
         </div>
 
+        {% if game_id == 'buscaminas' %}
+        <!-- INTERFAZ DEL CARTUCHO 01: BUSCAMINAS -->
         <div class="lab-showcase" style="margin-top: 2rem;">
             <div class="lab-description">
                 <h2>{{ game.title }}</h2>
@@ -53,10 +65,24 @@
                 <div class="minesweeper-board" id="minesweeper-board"></div>
             </div>
         </div>
+
         {% else %}
-        <div class="lab-description">
-            <h2>{{ game.title }}</h2>
-            <p>Este cartucho está en preparación. Puedes instalar el acceso directo desde ahora y se actualizará automáticamente.</p>
+        <!-- PLANTILLA BASE PARA CARTUCHOS EN DESARROLLO (SUDOKU, SOLITARIO, TETRIS, 2048, SNAKE) -->
+        <div class="lab-showcase" style="margin-top: 2.5rem;">
+            <div class="lab-description">
+                <span class="pill-tag">Cartucho {{ game.number }} · {{ game.status }}</span>
+                <h2>{{ game.title }}</h2>
+                <p>{{ game.description }}</p>
+                <p>
+                    El contenedor PWA y el Service Worker exclusivo de <strong>{{ game.title }}</strong> ya están activos en esta ruta (<code>/arcade/{{ game_id }}/</code>). Puedes instalar la aplicación desde ahora con el botón superior y recibirá la actualización del tablero automáticamente en cuanto se publique el motor del juego.
+                </p>
+            </div>
+            <div class="board-container">
+                <div class="cartridge-placeholder">
+                    <img src="/arcade/{{ game_id }}/icon.svg" alt="{{ game.title }}" width="96" height="96">
+                    <span>Contenedor PWA de {{ game.short_name }} listo</span>
+                </div>
+            </div>
         </div>
         {% endif %}
     </main>

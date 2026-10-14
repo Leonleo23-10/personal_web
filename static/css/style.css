@@ -710,3 +710,66 @@ body {
     display: block;
     cursor: crosshair;
 }
+/* ==========================================================================
+   8. ESTILOS DE CARTUCHOS DEL CATÁLOGO ARCADE Y DOCUMENTACIÓN VISUAL
+   ==========================================================================
+   NOTA DE MANTENIMIENTO:
+   - `.arcade-hub-grid` usa `auto-fill` con `minmax(320px, 1fr)` para acomodar
+     los 6 cartuchos en 3 columnas en escritorio, 2 en tablet y 1 en móvil.
+   - `.cartridge-icon` muestra el SVG dinámico generado por Flask en `app.py`.
+   ========================================================================== */
+.arcade-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.8rem;
+}
+
+.arcade-hub-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-line);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.arcade-hub-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--fern);
+}
+
+.cartridge-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.1rem 0 0.8rem;
+}
+
+.cartridge-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.cartridge-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.45rem;
+    margin: 0;
+}
+
+.cartridge-placeholder {
+    background: var(--pine-teal);
+    color: var(--dust-grey);
+    padding: 3.5rem 2.5rem;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid var(--dry-sage);
+}

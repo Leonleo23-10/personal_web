@@ -1,4 +1,24 @@
-// Íconos vectoriales SVG personalizados (Cero emojis)
+/**
+ * ============================================================================
+ * ARCHIVO CENTRAL DE INTERACTIVIDAD Y LÓGICA: static/js/main.js
+ * ============================================================================
+ * ÍNDICE DE MÓDULOS DE ESTE ARCHIVO:
+ *   [MÓDULO 0] Activos Vectoriales SVG (Banderas, Minas y Cursores).
+ *   [MÓDULO 1] Cursor Magnético Personalizado y Etiqueta Flotante (Awwwards UI).
+ *   [MÓDULO 2] Acordeón Desplegable de Casos de Estudio (Sección Proyectos).
+ *   [MÓDULO 3] Navegación de Scroll Suave y Conmutador de Tema (Claro / Oscuro).
+ *   [MÓDULO 4] Motor Completo de Buscaminas (Primer clic seguro + Chording).
+ *   [MÓDULO 5] Motor del Sandbox Físico en Portada (index.html).
+ *   [MÓDULO 6] Motor Multi-Lienzo para la página /experimentos.
+ *   [MÓDULO 7] Instalador de Aplicaciones Web Progresivas (PWA) por Cartucho.
+ * ============================================================================
+ */
+
+/* ============================================================================
+   [MÓDULO 0] ACTIVOS VECTORIALES SVG
+   Si deseas cambiar el diseño o el color de la bandera o la mina en el futuro,
+   solo modifica los atributos `fill` o `stroke` de estos strings SVG.
+   ============================================================================ */
 const SVG_FLAG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M5 21V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
     <path d="M5 4L19 9L5 14V4Z" fill="#588157" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
@@ -14,7 +34,12 @@ const SVG_MINE = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/
     <path d="M12 3V21M3 12H21M5.6 5.6L18.4 18.4M18.4 5.6L5.6 18.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>`;
 
-// 1. Cursor personalizado y vista previa flotante
+
+/* ============================================================================
+   [MÓDULO 1] CURSOR PERSONALIZADO Y ETIQUETA FLOTANTE
+   Actualiza las coordenadas `left` y `top` del círculo `.custom-cursor` y de
+   la píldora `.floating-preview` cuando el usuario mueve el ratón.
+   ============================================================================ */
 const cursor = document.getElementById('custom-cursor');
 const preview = document.getElementById('floating-preview');
 const previewTag = document.getElementById('preview-tag');
@@ -30,7 +55,13 @@ if (cursor) {
     });
 }
 
-// 2. Acordeón de proyectos
+
+/* ============================================================================
+   [MÓDULO 2] ACORDEÓN DE CASOS DE ESTUDIO (PROYECTOS)
+   Detecta todos los contenedores `.work-item`. Al hacer clic en su fila
+   superior (`.work-row`), cierra los demás proyectos abiertos y despliega
+   únicamente el seleccionado alternando la clase CSS `.open`.
+   ============================================================================ */
 document.querySelectorAll('.work-item').forEach(item => {
     const row = item.querySelector('.work-row');
     row.addEventListener('mouseenter', () => {
@@ -51,7 +82,12 @@ document.querySelectorAll('.work-item').forEach(item => {
     });
 });
 
-// 3. Navegación suave y cambio de tema
+
+/* ============================================================================
+   [MÓDULO 3] NAVEGACIÓN POR PÍLDORAS Y CAMBIO DE TEMA (LIGHT / DARK)
+   Alterna el atributo `data-mode` en la etiqueta raíz `<html>` entre "light"
+   (fondo Dust Grey) y "dark" (fondo Pine Teal).
+   ============================================================================ */
 document.querySelectorAll('.mode-pill').forEach(pill => {
     pill.addEventListener('click', () => {
         if (pill.id === 'theme-toggle') {
@@ -68,7 +104,18 @@ document.querySelectorAll('.mode-pill').forEach(pill => {
     });
 });
 
-// 4. Buscaminas con Banderas Vectoriales SVG y Chording
+
+/* ============================================================================
+   [MÓDULO 4] MOTOR DEL BUSCAMINAS (PRIMER CLIC SEGURO + FUNCIÓN CHORDING)
+   REGLAS IMPLEMENTADAS:
+   1. `firstClick`: Las minas nunca se colocan hasta después de que el usuario
+      hace el primer clic, garantizando que la primera casilla y sus 8 vecinas
+      estén siempre despejadas.
+   2. `Chording`: Si el usuario hace clic sobre una casilla que YA está revelada
+      (`cell.classList.contains('revealed')`) y el número de banderas colocadas
+      alrededor coincide exactamente con `counts[idx]`, se revelan de golpe
+      todas las casillas vecinas no abanderadas.
+   ============================================================================ */
 let SIZE = 8;
 let MINES_COUNT = 10;
 const boardEl = document.getElementById('minesweeper-board');
@@ -100,6 +147,7 @@ if (modeBtn) {
     });
 }
 
+// Selector de dificultad (8x8, 10x10, 12x12) en la vista individual del juego
 document.querySelectorAll('.diff-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
@@ -173,7 +221,7 @@ function onCellClick(idx) {
     if (gameOver) return;
     const cell = cells[idx];
 
-    // Chording: si la celda ya está descubierta y las banderas alrededor coinciden, revela las vecinas
+    // Lógica de Chording (Despeje rápido de vecinas alrededor de una celda ya descubierta)
     if (cell.classList.contains('revealed')) {
         const neededFlags = counts[idx];
         if (neededFlags > 0) {
@@ -246,7 +294,11 @@ function checkWin() {
 if (resetBtn) resetBtn.addEventListener('click', initBoard);
 initBoard();
 
-// 5. Canvas de la página principal (index.html)
+
+/* ============================================================================
+   [MÓDULO 5] MOTOR DEL SANDBOX FÍSICO EN PORTADA (index.html)
+   Controla el lienzo `#experiment-canvas` de la página de inicio.
+   ============================================================================ */
 const expCanvas = document.getElementById('experiment-canvas');
 if (expCanvas) {
     const ctx = expCanvas.getContext('2d');
@@ -346,7 +398,15 @@ if (expCanvas) {
     renderLoop();
 }
 
-// 6. Motores independientes para la página /experimentos (Scroll de múltiples simulaciones)
+
+/* ============================================================================
+   [MÓDULO 6] MOTOR MULTI-LIENZO PARA LA PÁGINA /experimentos
+   CÓMO AGREGAR UN NUEVO EXPERIMENTO EN `templates/experimentos.html`:
+   1. Añade una nueva sección `<section class="experiments-section" id="exp-04">`
+      con un `<canvas id="canvas-nuevo" class="multi-exp-canvas" data-type="nuevo">`.
+   2. En este bucle, añade un bloque `else if (type === 'nuevo') { ... }` con
+      las ecuaciones de dibujo que desees graficar.
+   ============================================================================ */
 document.querySelectorAll('.multi-exp-canvas').forEach(canvas => {
     const ctx = canvas.getContext('2d');
     const type = canvas.dataset.type;
@@ -434,14 +494,28 @@ document.querySelectorAll('.multi-exp-canvas').forEach(canvas => {
     animate();
 });
 
-// 7. Instalación PWA Individual por Juego
+
+/* ============================================================================
+   [MÓDULO 7] FORMULARIO DE CONTACTO E INSTALACIÓN PWA INDIVIDUAL POR JUEGO
+   Si el `<body>` tiene el atributo `data-game-scope="/arcade/<id>/"`, registra
+   el Service Worker exclusivo de ese cartucho para aislar su instalación.
+   ============================================================================ */
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const feedback = document.getElementById('form-feedback');
+        feedback.textContent = 'Mensaje registrado correctamente. Me pondré en contacto contigo pronto.';
+        contactForm.reset();
+    });
+}
+
 let deferredPrompt = null;
 const pwaBtn = document.getElementById('pwa-install-btn');
 const gameScope = document.body.dataset.gameScope;
 
 if ('serviceWorker' in navigator) {
     if (gameScope) {
-        // Registra el Service Worker exclusivo del juego actual
         navigator.serviceWorker.register(`${gameScope}sw.js`, { scope: gameScope });
     } else {
         navigator.serviceWorker.register('/sw.js');
@@ -451,9 +525,6 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    if (pwaBtn) {
-        pwaBtn.textContent = 'Instalar este Juego como App';
-    }
 });
 
 if (pwaBtn) {
@@ -463,7 +534,7 @@ if (pwaBtn) {
             await deferredPrompt.userChoice;
             deferredPrompt = null;
         } else {
-            alert('Si estás en iOS (Safari) o ya instalaste la app, usa el botón "Compartir -> Agregar a pantalla de inicio" de tu navegador para crear el ícono individual de este juego.');
+            alert('Si estás en iOS (Safari) o ya instalaste la app, usa el menú del navegador -> "Agregar a la pantalla de inicio" para crear el acceso directo individual de este juego.');
         }
     });
 }

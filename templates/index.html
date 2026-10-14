@@ -1,4 +1,24 @@
 <!DOCTYPE html>
+<!-- 
+================================================================================
+PLANTILLA PRINCIPAL: templates/index.html
+================================================================================
+ESTRUCTURA DEL DOCUMENTO:
+1. Elementos Flotantes Globales: Cursor personalizado y píldora de vista previa.
+2. Barra de Navegación Superior (.nav-header): Enlaces de anclaje y botón de tema.
+3. Sección Hero (.hero-section): Presentación editorial de alto impacto.
+4. Sección 01 - Proyectos (.works-section): Lista con acordeón desplegable.
+5. Sección 02 - Demo Arcade (.lab-section): Tablero demostrativo + link a /arcade.
+6. Sección 03 - Sandbox (.experiments-section): Simulación previa + link a /experimentos.
+7. Sección 04 - Contacto (.footer-section): Enlaces directos y formulario.
+
+CÓMO AGREGAR UN NUEVO PROYECTO A LA SECCIÓN 01:
+Copia un bloque <article class="work-item">...</article> completo, incrementa el
+número en <span class="work-index">04</span> y edita los textos de Problema,
+Solución y las etiquetas dentro de <div class="tech-tags">. El acordeón en JS
+lo detectará automáticamente sin tocar código adicional.
+================================================================================
+-->
 <html lang="es" data-mode="light">
 <head>
     <meta charset="UTF-8">
@@ -10,12 +30,17 @@
 </head>
 <body>
 
+    <!-- Elementos visuales controlados por mousemove en static/js/main.js -->
     <div class="custom-cursor" id="custom-cursor"></div>
-
     <div class="floating-preview" id="floating-preview">
         <span id="preview-tag">Ver caso de estudio</span>
     </div>
 
+    <!-- =======================================================================
+         BARRA DE NAVEGACIÓN
+         Cada botón con el atributo `data-target="#id"` hace scroll suave hacia
+         esa sección. El botón con `id="theme-toggle"` alterna data-mode="light/dark".
+         ======================================================================= -->
     <header class="nav-header">
         <a href="/" class="brand">leo<span class="dot">.</span></a>
         
@@ -31,7 +56,9 @@
     </header>
 
     <main>
-        <!-- HERO EDITORIAL -->
+        <!-- ===================================================================
+             HERO EDITORIAL
+             =================================================================== -->
         <section class="hero-section">
             <div class="hero-meta">
                 <span>DESARROLLO DE SOFTWARE & FÍSICA</span>
@@ -48,7 +75,11 @@
             </div>
         </section>
 
-        <!-- 01 // PROYECTOS CON DESPLIEGUE DE CASOS DE ESTUDIO -->
+        <!-- ===================================================================
+             01 // PROYECTOS Y ARQUITECTURA (ACORDEÓN DESPLEGABLE)
+             Al hacer clic en `.work-row`, JS alterna la clase `.open` en el
+             contenedor padre `.work-item`, desplegando `.work-details`.
+             =================================================================== -->
         <section class="works-section" id="proyectos">
             <div class="section-header">
                 <span>01 // PROYECTOS Y ARQUITECTURA</span>
@@ -56,6 +87,7 @@
             </div>
 
             <div class="work-list">
+                <!-- PROYECTO 01 -->
                 <article class="work-item">
                     <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
                         <div class="work-left">
@@ -88,6 +120,7 @@
                     </div>
                 </article>
 
+                <!-- PROYECTO 02 -->
                 <article class="work-item">
                     <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
                         <div class="work-left">
@@ -120,6 +153,7 @@
                     </div>
                 </article>
 
+                <!-- PROYECTO 03 -->
                 <article class="work-item">
                     <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
                         <div class="work-left">
@@ -154,11 +188,15 @@
             </div>
         </section>
 
-        <!-- 02 // DEMOSTRACIÓN ARCADE -->
+        <!-- ===================================================================
+             02 // DEMOSTRACIÓN DEL ARCADE EN PORTADA
+             El tablero `#minesweeper-board` se inicializa en `main.js`.
+             El botón final redirige a `/arcade` donde viven los 6 cartuchos PWA.
+             =================================================================== -->
         <section class="lab-section" id="arcade">
             <div class="section-header">
                 <span>02 // DEMOSTRACIÓN ARCADE SIN ANUNCIOS</span>
-                <span>MODO DEMOSTRACIÓN INTERACTIVO</span>
+                <span>6 CARTUCHOS DISPONIBLES EN EL CATÁLOGO</span>
             </div>
 
             <div class="lab-showcase">
@@ -166,7 +204,7 @@
                     <span class="pill-tag">Juegos Clásicos · Cero Publicidad</span>
                     <h2>Buscaminas con Despeje Rápido.</h2>
                     <p>
-                        Pruébalo aquí mismo: incluye primer clic seguro y despeje automático alrededor cuando haces clic en una casilla numérica que ya tiene sus banderas completas. Para ver todos los juegos e instalarlos como aplicaciones individuales en tu dispositivo, entra al catálogo del Arcade.
+                        Pruébalo aquí mismo: incluye primer clic seguro y despeje automático alrededor cuando haces clic en una casilla numérica que ya tiene sus banderas completas. Para explorar los 6 cartuchos (Buscaminas, Sudoku, Solitario, Tetris, 2048 y Snake) e instalarlos como aplicaciones individuales, abre el catálogo completo.
                     </p>
 
                     <div class="game-toolbar">
@@ -175,7 +213,7 @@
                             <span id="mode-label">Modo: Cavar</span>
                         </button>
                         <button id="reset-mines" class="btn-editorial">Reiniciar Tablero</button>
-                        <a href="/arcade" class="btn-editorial btn-outline">Ver Catálogo Arcade & Instalar Apps ↗</a>
+                        <a href="/arcade" class="btn-editorial btn-outline">Ver los 6 Cartuchos & Instalar Apps ↗</a>
                     </div>
                     <p class="mine-status" id="mine-status">Minas: 10 · Haz clic en un número descubierto con sus banderas completas para despejar alrededor.</p>
                 </div>
@@ -186,7 +224,9 @@
             </div>
         </section>
 
-        <!-- 03 // SANDBOX MATEMÁTICO (VISTA PREVIA + ENLACE AL LABORATORIO COMPLETO) -->
+        <!-- ===================================================================
+             03 // SANDBOX MATEMÁTICO (VISTA PREVIA + ENLACE A /experimentos)
+             =================================================================== -->
         <section class="experiments-section" id="experimentos">
             <div class="section-header">
                 <span>03 // MINI EXPERIMENTOS & FÍSICA COMPUTACIONAL</span>
@@ -224,7 +264,9 @@
         </section>
     </main>
 
-    <!-- 04 // CONTACTO -->
+    <!-- =======================================================================
+         04 // SECCIÓN DE CONTACTO
+         ======================================================================= -->
     <footer class="footer-section" id="contacto">
         <div class="footer-top">
             <span>04 // CONTACTO DIRECTO</span>
