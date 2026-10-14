@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" data-mode="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Experimentos — Leonardo Viscaya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <header class="nav-header">
+        <a href="/" class="brand">leo<span class="dot">.</span>lab</a>
+        <nav class="mode-switch-wrapper">
+            <a href="/" class="mode-pill" style="text-decoration:none;">← Inicio</a>
+            <button class="mode-pill active" data-target="#exp-01">01. Gravedad</button>
+            <button class="mode-pill" data-target="#exp-02">02. Ondas</button>
+            <button class="mode-pill" data-target="#exp-03">03. Campo Magnético</button>
+            <button class="mode-pill" id="theme-toggle">Tema</button>
+        </nav>
+        <span>SANDBOX FÍSICO & VISUAL</span>
+    </header>
+
+    <main>
+        <!-- ENCABEZADO DEL LABORATORIO -->
+        <section class="works-section">
+            <div class="section-header">
+                <span>COLECCIÓN DE SIMULACIONES INTERACTIVAS</span>
+                <span>SCROLL PARA PROBAR CADA EXPERIMENTO ↓</span>
+            </div>
+            <h1 class="display-title" style="font-size: clamp(2.2rem, 4.8vw, 4.6rem); margin: 2rem 0 1rem;">
+                MINI <span class="italic-accent">EXPERIMENTOS</span>.
+            </h1>
+            <p class="hero-bio" style="max-width: 660px;">
+                Archivo de simulaciones matemáticas, sistemas dinámicos y visualizaciones interactivas en HTML5 Canvas. Usa el menú superior o desplázate hacia abajo para interactuar con cada modelo.
+            </p>
+        </section>
+
+        <!-- EXPERIMENTO 01: GRAVITACIÓN -->
+        <section class="experiments-section" id="exp-01">
+            <div class="section-header">
+                <span>EXPERIMENTO 01 // MECÁNICA CLÁSICA</span>
+                <span>INTERACCIÓN EN TIEMPO REAL</span>
+            </div>
+            <div class="experiment-wrapper">
+                <div class="experiment-sidebar">
+                    <span class="pill-tag">Sistemas Dinámicos</span>
+                    <h2>Campo Gravitacional Central</h2>
+                    <p>Enjambre de partículas sometidas a un potencial central con amortiguamiento suave. Mueve el cursor sobre el lienzo para desplazar el centro de masa atractor.</p>
+                    <div class="exp-controls">
+                        <label>Constante de Atracción (G)</label>
+                        <input type="range" class="lab-slider" data-canvas="canvas-gravity" min="10" max="100" value="50">
+                    </div>
+                </div>
+                <div class="experiment-canvas-box">
+                    <canvas id="canvas-gravity" class="multi-exp-canvas" data-type="gravity"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPERIMENTO 02: INTERFERENCIA DE ONDAS -->
+        <section class="experiments-section" id="exp-02">
+            <div class="section-header">
+                <span>EXPERIMENTO 02 // FENÓMENOS ONDULATORIOS</span>
+                <span>SUPERPOSICIÓN ARMÓNICA</span>
+            </div>
+            <div class="experiment-wrapper">
+                <div class="experiment-sidebar">
+                    <span class="pill-tag">Óptica & Acústica</span>
+                    <h2>Interferencia de Frentes de Onda</h2>
+                    <p>Visualización de frentes armónicos modulados por la distancia radial al cursor. Ajusta el número de onda con el deslizador.</p>
+                    <div class="exp-controls">
+                        <label>Frecuencia Espacial (k)</label>
+                        <input type="range" class="lab-slider" data-canvas="canvas-waves" min="10" max="100" value="45">
+                    </div>
+                </div>
+                <div class="experiment-canvas-box">
+                    <canvas id="canvas-waves" class="multi-exp-canvas" data-type="waves"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPERIMENTO 03: LÍNEAS DE CAMPO VECTORIAL -->
+        <section class="experiments-section" id="exp-03">
+            <div class="section-header">
+                <span>EXPERIMENTO 03 // ELECTROMAGNETISMO</span>
+                <span>CAMPO VECTORIAL DIPOLAR</span>
+            </div>
+            <div class="experiment-wrapper">
+                <div class="experiment-sidebar">
+                    <span class="pill-tag">Campos Vectoriales</span>
+                    <h2>Malla de Brújulas Magnéticas</h2>
+                    <p>Arreglo bidimensional de dipolos que se orientan instantáneamente siguiendo las líneas de campo generadas por la posición de tu cursor.</p>
+                    <div class="exp-controls">
+                        <label>Longitud de Aguja Vectorial</label>
+                        <input type="range" class="lab-slider" data-canvas="canvas-field" min="10" max="40" value="22">
+                    </div>
+                </div>
+                <div class="experiment-canvas-box">
+                    <canvas id="canvas-field" class="multi-exp-canvas" data-type="field"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

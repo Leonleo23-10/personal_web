@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade PWA — Juegos Clásicos Sin Anuncios</title>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#344e41">
+    <title>Catálogo Arcade — Juegos Instalables Sin Anuncios</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -15,65 +13,49 @@
     <header class="nav-header">
         <a href="/" class="brand">leo<span class="dot">.</span>arcade</a>
         <div class="mode-switch-wrapper">
-            <a href="/" class="mode-pill" style="text-decoration:none;">Volver al Portafolio</a>
+            <a href="/" class="mode-pill" style="text-decoration:none;">← Volver al Portafolio</a>
             <button class="mode-pill" id="theme-toggle">Tema</button>
         </div>
-        <button id="pwa-install-btn" class="btn-editorial active">Instalar Arcade como App (PWA)</button>
+        <span>COLECCIÓN SIN ANUNCIOS</span>
     </header>
 
     <main class="works-section">
         <div class="section-header">
-            <span>COLECCIÓN PERSONAL SIN PUBLICIDAD</span>
-            <span id="offline-status">ESTADO: LISTO PARA USO OFFLINE</span>
+            <span>CADA JUEGO ES UNA APLICACIÓN INDEPENDIENTE</span>
+            <span>SOPORTE PWA INDIVIDUAL</span>
         </div>
 
-        <h1 class="display-title" style="font-size: clamp(2rem, 4.5vw, 4.2rem); margin: 2rem 0;">
-            ARCADE <span class="italic-accent">OFFLINE</span>.
+        <h1 class="display-title" style="font-size: clamp(2.2rem, 4.8vw, 4.5rem); margin: 2rem 0;">
+            CATÁLOGO <span class="italic-accent">ARCADE</span>.
         </h1>
-        <p class="hero-bio" style="max-width: 680px; margin-bottom: 3rem;">
-            Instala esta sección como aplicación web progresiva (PWA) en tu teléfono o computadora. Una vez instalada o abierta una vez, todos los juegos quedan guardados en la memoria caché del navegador para jugar sin conexión a internet y sin anuncios.
+        <p class="hero-bio" style="max-width: 680px; margin-bottom: 3.5rem;">
+            Cada juego de esta colección tiene su propio contenedor y manifiesto independiente. Entra al juego que quieras para jugarlo a pantalla completa o instalarlo individualmente como aplicación en tu teléfono o computadora.
         </p>
 
-        <!-- Selector de Juegos y Dificultad -->
         <div class="arcade-hub-grid">
-            <div class="arcade-hub-card active-game">
+            <article class="arcade-hub-card">
                 <div class="section-header">
-                    <span>CARTUCHO 01</span>
-                    <span>DISPONIBLE</span>
+                    <span>JUEGO 01 · DISPONIBLE</span>
+                    <span>PWA LISTA</span>
                 </div>
-                <h2>Buscaminas Completo</h2>
-                <p>Incluye despeje rápido al hacer clic sobre números resueltos, primer movimiento seguro y tres niveles de densidad.</p>
-                <div class="game-toolbar" style="margin-top: 1.2rem;">
-                    <button class="btn-editorial active diff-btn" data-size="8" data-mines="10">8x8 (10 Minas)</button>
-                    <button class="btn-editorial diff-btn" data-size="10" data-mines="16">10x10 (16 Minas)</button>
-                    <button class="btn-editorial diff-btn" data-size="12" data-mines="24">12x12 (24 Minas)</button>
+                <h2>Buscaminas Botánico</h2>
+                <p>Versión táctil con banderas vectoriales, primer clic garantizado sin mina, despeje rápido de casillas vecinas y tres tamaños de tablero.</p>
+                <div class="game-toolbar" style="margin-top: 1.5rem;">
+                    <a href="/arcade/buscaminas/" class="btn-editorial active">Abrir & Instalar Buscaminas ↗</a>
                 </div>
-            </div>
+            </article>
 
-            <div class="arcade-hub-card">
+            <article class="arcade-hub-card">
                 <div class="section-header">
-                    <span>CARTUCHO 02</span>
+                    <span>JUEGO 02 · PRÓXIMAMENTE</span>
                     <span>EN DESARROLLO</span>
                 </div>
                 <h2>Sudoku Minimalista</h2>
-                <p>Generador matemático de tableros con solución única, notas por casilla y guardado automático en almacenamiento local.</p>
-                <span class="pill-tag" style="margin-top:1rem;">Próximamente en este Hub</span>
-            </div>
-        </div>
-
-        <!-- Zona de Juego Principal en el Hub -->
-        <div class="lab-showcase" style="margin-top: 4rem;">
-            <div class="lab-description">
-                <h2>Tablero Activo</h2>
-                <p id="mine-status">Minas: 10 · Haz clic en un número descubierto con sus banderas completas para desbloquear alrededor.</p>
-                <div class="game-toolbar">
-                    <button id="mode-toggle" class="btn-editorial active">Modo: Cavar</button>
-                    <button id="reset-mines" class="btn-editorial">Nuevo Tablero</button>
+                <p>Tableros generados matemáticamente con solución única, modo de anotaciones en esquina y guardado de partida en memoria local.</p>
+                <div class="game-toolbar" style="margin-top: 1.5rem;">
+                    <a href="/arcade/sudoku/" class="btn-editorial">Ver Vista Previa & Instalar ↗</a>
                 </div>
-            </div>
-            <div class="board-container">
-                <div class="minesweeper-board" id="minesweeper-board"></div>
-            </div>
+            </article>
         </div>
     </main>
 

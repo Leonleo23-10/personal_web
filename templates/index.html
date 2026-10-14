@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leonardo Viscaya — Desarrollo & Laboratorio</title>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#344e41">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -29,7 +27,7 @@
             <button class="mode-pill" id="theme-toggle" title="Cambiar contraste">Tema</button>
         </nav>
 
-        <a href="/arcade" class="nav-link">Ir al Arcade PWA -></a>
+        <a href="#contacto" class="nav-link">Disponible para proyectos ↗</a>
     </header>
 
     <main>
@@ -46,7 +44,7 @@
                 <p class="hero-bio">
                     Diseño y programo plataformas web completas en Python, Flask y SQL, integrando flujos de pago, sistemas administrativos y experiencias interactivas libres de anuncios.
                 </p>
-                <div class="scroll-indicator">DESPLAZAR HACIA ABAJO</div>
+                <div class="scroll-indicator">SCROLL ↓</div>
             </div>
         </section>
 
@@ -58,7 +56,6 @@
             </div>
 
             <div class="work-list">
-                <!-- Proyecto 01 -->
                 <article class="work-item">
                     <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
                         <div class="work-left">
@@ -85,13 +82,12 @@
                                 <div class="tech-tags">
                                     <span>Python</span><span>Flask</span><span>SQLite / PostgreSQL</span><span>JavaScript</span><span>HTML/CSS</span>
                                 </div>
-                                <a href="#contacto" class="project-link">Solicitar demostración o ver repositorio -></a>
+                                <a href="#contacto" class="project-link">Solicitar demostración o ver proyecto ↗</a>
                             </div>
                         </div>
                     </div>
                 </article>
 
-                <!-- Proyecto 02 -->
                 <article class="work-item">
                     <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
                         <div class="work-left">
@@ -118,13 +114,12 @@
                                 <div class="tech-tags">
                                     <span>Python</span><span>Stripe API</span><span>Stripe Connect</span><span>SQL</span><span>Flask</span>
                                 </div>
-                                <a href="#contacto" class="project-link">Consultar detalles de implementación -></a>
+                                <a href="#contacto" class="project-link">Consultar detalles de implementación ↗</a>
                             </div>
                         </div>
                     </div>
                 </article>
 
-                <!-- Proyecto 03 -->
                 <article class="work-item">
                     <div class="work-row" data-preview="Haz clic para ver arquitectura y retos">
                         <div class="work-left">
@@ -151,7 +146,7 @@
                                 <div class="tech-tags">
                                     <span>JavaScript ES6</span><span>CSS Grid / Flexbox</span><span>Flask Backend</span><span>JSON API</span>
                                 </div>
-                                <a href="#contacto" class="project-link">Ver arquitectura del proyecto -></a>
+                                <a href="#contacto" class="project-link">Ver arquitectura del proyecto ↗</a>
                             </div>
                         </div>
                     </div>
@@ -159,7 +154,7 @@
             </div>
         </section>
 
-        <!-- 02 // DEMOSTRACIÓN ARCADE (CON CHORDING Y ENLACE AL HUB PWA) -->
+        <!-- 02 // DEMOSTRACIÓN ARCADE -->
         <section class="lab-section" id="arcade">
             <div class="section-header">
                 <span>02 // DEMOSTRACIÓN ARCADE SIN ANUNCIOS</span>
@@ -169,15 +164,18 @@
             <div class="lab-showcase">
                 <div class="lab-description">
                     <span class="pill-tag">Juegos Clásicos · Cero Publicidad</span>
-                    <h2>Buscaminas Táctil con Despeje Rápido.</h2>
+                    <h2>Buscaminas con Despeje Rápido.</h2>
                     <p>
-                        Esta es una demostración en vivo de mi colección de juegos ligeros. Incluye primer clic seguro y despeje rápido: al hacer clic sobre una casilla numérica ya descubierta que tenga sus minas vecinas marcadas con bandera (`F`), se desbloquean automáticamente todas las casillas alrededor.
+                        Pruébalo aquí mismo: incluye primer clic seguro y despeje automático alrededor cuando haces clic en una casilla numérica que ya tiene sus banderas completas. Para ver todos los juegos e instalarlos como aplicaciones individuales en tu dispositivo, entra al catálogo del Arcade.
                     </p>
 
                     <div class="game-toolbar">
-                        <button id="mode-toggle" class="btn-editorial active">Modo: Cavar</button>
+                        <button id="mode-toggle" class="btn-editorial active">
+                            <span class="btn-icon-svg" id="mode-icon"></span>
+                            <span id="mode-label">Modo: Cavar</span>
+                        </button>
                         <button id="reset-mines" class="btn-editorial">Reiniciar Tablero</button>
-                        <a href="/arcade" class="btn-editorial btn-outline">Abrir Hub Arcade & Instalar PWA -></a>
+                        <a href="/arcade" class="btn-editorial btn-outline">Ver Catálogo Arcade & Instalar Apps ↗</a>
                     </div>
                     <p class="mine-status" id="mine-status">Minas: 10 · Haz clic en un número descubierto con sus banderas completas para despejar alrededor.</p>
                 </div>
@@ -188,18 +186,18 @@
             </div>
         </section>
 
-        <!-- 03 // MINI EXPERIMENTOS Y SIMULACIONES FÍSICAS -->
+        <!-- 03 // SANDBOX MATEMÁTICO (VISTA PREVIA + ENLACE AL LABORATORIO COMPLETO) -->
         <section class="experiments-section" id="experimentos">
             <div class="section-header">
                 <span>03 // MINI EXPERIMENTOS & FÍSICA COMPUTACIONAL</span>
-                <span>LIENZO INTERACTIVO EN TIEMPO REAL</span>
+                <span>VISTA PREVIA DEL LABORATORIO</span>
             </div>
 
             <div class="experiment-wrapper">
                 <div class="experiment-sidebar">
                     <span class="pill-tag">Sandbox Matemático</span>
                     <h2>Laboratorio Visual</h2>
-                    <p>Espacio dedicado a pequeñas simulaciones de física, sistemas dinámicos y experimentos de interfaz programados en JavaScript puro.</p>
+                    <p>Espacio donde publico simulaciones físicas, sistemas gravitacionales, fenómenos ondulatorios y experimentos interactivos programados desde cero.</p>
                     
                     <div class="exp-selector">
                         <button class="exp-btn active" data-sim="gravity">01. Campo Gravitacional Central</button>
@@ -209,7 +207,10 @@
                     <div class="exp-controls">
                         <label for="sim-param">Intensidad / Frecuencia del Sistema</label>
                         <input type="range" id="sim-param" min="10" max="100" value="45">
-                        <button id="sim-reset" class="btn-editorial">Reiniciar Condiciones Iniciales</button>
+                        <div class="game-toolbar" style="margin-top: 0.6rem;">
+                            <button id="sim-reset" class="btn-editorial">Reiniciar Simulación</button>
+                            <a href="/experimentos" class="btn-editorial btn-outline">Explorar Todos los Experimentos ↗</a>
+                        </div>
                     </div>
                 </div>
 
@@ -223,7 +224,7 @@
         </section>
     </main>
 
-    <!-- 04 // SECCIÓN DE CONTACTO COMPLETA -->
+    <!-- 04 // CONTACTO -->
     <footer class="footer-section" id="contacto">
         <div class="footer-top">
             <span>04 // CONTACTO DIRECTO</span>
@@ -237,8 +238,8 @@
                     Si buscas desarrollar una aplicación web a medida, integrar pasarelas de pago o colaborar en un proyecto técnico, escríbeme directamente.
                 </p>
                 <div class="direct-links">
-                    <a href="mailto:contacto@viscayaleonardo.com" class="contact-pill">Correo Electrónico -></a>
-                    <a href="https://github.com/Leonleo23-10" target="_blank" rel="noopener" class="contact-pill">GitHub -></a>
+                    <a href="mailto:contacto@viscayaleonardo.com" class="contact-pill">Correo Electrónico ↗</a>
+                    <a href="https://github.com/Leonleo23-10" target="_blank" rel="noopener" class="contact-pill">GitHub ↗</a>
                 </div>
             </div>
 

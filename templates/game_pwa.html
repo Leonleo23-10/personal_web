@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" data-mode="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ game.title }} — App Offline</title>
+    <!-- Manifiesto e ícono exclusivos de este juego -->
+    <link rel="manifest" href="/arcade/{{ game_id }}/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/arcade/{{ game_id }}/icon.svg">
+    <meta name="theme-color" content="#344e41">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-game-scope="/arcade/{{ game_id }}/">
+
+    <header class="nav-header">
+        <a href="/arcade" class="brand">← {{ game.short_name }}<span class="dot">.</span></a>
+        <div class="mode-switch-wrapper">
+            <button class="mode-pill" id="theme-toggle">Tema</button>
+        </div>
+        <button id="pwa-install-btn" class="btn-editorial active">Instalar {{ game.short_name }} como App</button>
+    </header>
+
+    <main class="works-section">
+        {% if game_id == 'buscaminas' %}
+        <div class="section-header">
+            <span>APLICACIÓN INDEPENDIENTE SIN ANUNCIOS</span>
+            <span id="pwa-status-hint">FUNCIONA 100% OFFLINE</span>
+        </div>
+
+        <div class="lab-showcase" style="margin-top: 2rem;">
+            <div class="lab-description">
+                <h2>{{ game.title }}</h2>
+                <p id="mine-status">Minas: 10 · Haz clic en un número descubierto con sus banderas completas para desbloquear alrededor.</p>
+                
+                <div class="game-toolbar">
+                    <button class="btn-editorial active diff-btn" data-size="8" data-mines="10">8x8 (10)</button>
+                    <button class="btn-editorial diff-btn" data-size="10" data-mines="16">10x10 (16)</button>
+                    <button class="btn-editorial diff-btn" data-size="12" data-mines="24">12x12 (24)</button>
+                </div>
+
+                <div class="game-toolbar" style="margin-top: 1rem;">
+                    <button id="mode-toggle" class="btn-editorial active">
+                        <span class="btn-icon-svg" id="mode-icon"></span>
+                        <span id="mode-label">Modo: Cavar</span>
+                    </button>
+                    <button id="reset-mines" class="btn-editorial">Nuevo Tablero</button>
+                </div>
+            </div>
+
+            <div class="board-container">
+                <div class="minesweeper-board" id="minesweeper-board"></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="lab-description">
+            <h2>{{ game.title }}</h2>
+            <p>Este cartucho está en preparación. Puedes instalar el acceso directo desde ahora y se actualizará automáticamente.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
