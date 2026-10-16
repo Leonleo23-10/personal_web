@@ -13,11 +13,18 @@ import sqlite3
 import subprocess
 from flask import Flask, render_template, send_from_directory, request, abort, jsonify, Response
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
+except ImportError:
+    pass
+
 app = Flask(__name__)
 
-REPO_PATH = '/home/viscayaleonardo/personal_web'
-WSGI_FILE = '/var/www/viscayaleonardo_pythonanywhere_com_wsgi.py'
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'portfolio.db')
+REPO_PATH = os.getenv('REPO_PATH', '/home/viscayaleonardo/personal_web')
+WSGI_FILE = os.getenv('WSGI_FILE', '/var/www/viscayaleonardo_pythonanywhere_com_wsgi.py')
+DB_NAME = os.getenv('DB_NAME', 'portfolio.db')
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), DB_NAME)
 
 
 # =============================================================================
@@ -57,7 +64,7 @@ init_db()
 GAMES = {
     'buscaminas': {
         'number': '01',
-        'title': 'Buscaminas Botánico',
+        'title': 'Buscaminas',
         'short_name': 'Buscaminas',
         'status': 'DISPONIBLE',
         'score_label': 'VICTORIAS',
@@ -66,7 +73,7 @@ GAMES = {
     },
     'sudoku': {
         'number': '02',
-        'title': 'Sudoku Minimalista',
+        'title': 'Sudoku',
         'short_name': 'Sudoku',
         'status': 'DISPONIBLE',
         'score_label': 'RESUELTOS',
@@ -75,7 +82,7 @@ GAMES = {
     },
     'solitario': {
         'number': '03',
-        'title': 'Solitario Klondike',
+        'title': 'Solitario',
         'short_name': 'Solitario',
         'status': 'DISPONIBLE',
         'score_label': 'VICTORIAS',
@@ -84,7 +91,7 @@ GAMES = {
     },
     'tetris': {
         'number': '04',
-        'title': 'Tetris Clásico',
+        'title': 'Tetris',
         'short_name': 'Tetris',
         'status': 'DISPONIBLE',
         'score_label': 'RÉCORD PTS',
@@ -93,7 +100,7 @@ GAMES = {
     },
     '2048': {
         'number': '05',
-        'title': '2048 Botánico',
+        'title': '2048',
         'short_name': '2048',
         'status': 'DISPONIBLE',
         'score_label': 'RÉCORD PTS',
@@ -102,7 +109,7 @@ GAMES = {
     },
     'snake': {
         'number': '06',
-        'title': 'Snake Retro',
+        'title': 'Snake',
         'short_name': 'Snake',
         'status': 'DISPONIBLE',
         'score_label': 'MÁX LONGITUD',
@@ -208,7 +215,7 @@ def game_sw(game_id):
     if game_id not in GAMES:
         abort(404)
     sw_code = f"""
-    const CACHE_NAME = 'pwa-game-{game_id}-v4';
+    const CACHE_NAME = 'pwa-game-{game_id}-v5';
     const URLS = [
         '/arcade/{game_id}/',
         '/static/css/style.css',
@@ -222,7 +229,11 @@ def game_sw(game_id):
         e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(URLS)));
     }});
     self.addEventListener('activate', e => {{
-        e.waitUntil(clients.claim());
+        e.waitUntil(
+            caches.keys().then(keys => Promise.all(
+                keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+            )).then(() => clients.claim())
+        );
     }});
     self.addEventListener('fetch', e => {{
         if (e.request.method !== 'GET') return;
@@ -271,4 +282,6 @@ def webhook():
     abort(400)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('FLASK_DEBUG', '1') == '1'
+    app.run(debug=debug, port=port)
