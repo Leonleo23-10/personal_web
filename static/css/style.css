@@ -710,6 +710,65 @@ body {
     display: block;
     cursor: crosshair;
 }
+
+.motion-detector-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.motion-detector-status {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.motion-detector-box {
+    justify-content: center;
+}
+
+.motion-detector-stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    min-height: 360px;
+}
+
+.motion-detector-stage video,
+.motion-detector-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    background: #192426;
+    object-fit: contain;
+}
+
+.motion-indicator {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    margin: 0;
+    padding: 0.65rem 1rem;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: #adff2f;
+    color: #192426;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.motion-indicator[hidden] {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .motion-detector-stage {
+        grid-template-columns: 1fr;
+    }
+}
 /* ==========================================================================
    8. ESTILOS DE CARTUCHOS DEL CATÁLOGO ARCADE Y DOCUMENTACIÓN VISUAL
    ==========================================================================

@@ -9,7 +9,7 @@
  *   [MÓDULO 3] Navegación de Scroll Suave y Conmutador de Tema (Claro / Oscuro).
  *   [MÓDULO 4] Motor Demostrativo de Buscaminas en Portada (Primer clic seguro + Chording).
  *   [MÓDULO 5] Motor del Sandbox Físico en Portada (index.html).
- *   [MÓDULO 6] Motor Multi-Lienzo para la página /experimentos.
+ *   [MÓDULO 6] Motores de experimentos: multi-lienzo y detector de movimiento.
  *   [MÓDULO 7] Formulario de Contacto SQLite e Instalador PWA por Cartucho.
  * ============================================================================
  */
@@ -427,9 +427,176 @@ if (expCanvas) {
 
 
 /* ============================================================================
-   [MÓDULO 6] MOTOR MULTI-LIENZO PARA LA PÁGINA /experimentos
-   Controla todos los lienzos `.multi-exp-canvas` (Gravedad, Ondas y Campo Magnético).
+   [MÓDULO 6] EXPERIMENTOS DE LA PÁGINA /experimentos
+   Controla los lienzos de simulación y el detector de movimiento por cámara.
    ============================================================================ */
+const motionVideo = document.getElementById('motion-video');
+const motionCanvas = document.getElementById('motion-canvas');
+const motionStartButton = document.getElementById('motion-start');
+const motionStopButton = document.getElementById('motion-stop');
+const motionStatus = document.getElementById('motion-status');
+const motionIndicator = document.getElementById('motion-indicator');
+const motionSensitivity = document.getElementById('motion-sensitivity');
+const motionSensitivityValue = document.getElementById('motion-sensitivity-value');
+
+if (
+    motionVideo && motionCanvas && motionStartButton && motionStopButton &&
+    motionStatus && motionIndicator && motionSensitivity
+) {
+    const motionContext = motionCanvas.getContext('2d');
+    let cameraStream = null;
+    let previousFrame = null;
+    let motionAnimationId = null;
+    let cameraRequestId = 0;
+
+    function setMotionStatus(message) {
+        motionStatus.textContent = message;
+    }
+
+    function stopMotionDetection(message = 'La detección está detenida.') {
+        cameraRequestId++;
+        if (motionAnimationId !== null) {
+            cancelAnimationFrame(motionAnimationId);
+            motionAnimationId = null;
+        }
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+        motionVideo.srcObject = null;
+        previousFrame = null;
+        motionIndicator.hidden = true;
+        motionContext.clearRect(0, 0, motionCanvas.width, motionCanvas.height);
+        motionStartButton.disabled = false;
+        motionStopButton.disabled = true;
+        setMotionStatus(message);
+    }
+
+    function convertFrameToGrayscale(imageData) {
+        const pixels = imageData.data;
+        for (let i = 0; i < pixels.length; i += 4) {
+            const luminance = (pixels[i] * 77 + pixels[i + 1] * 150 + pixels[i + 2] * 29) >> 8;
+            pixels[i] = luminance;
+            pixels[i + 1] = luminance;
+            pixels[i + 2] = luminance;
+        }
+    }
+
+    function compareFrames(currentFrame, previousFrameData) {
+        const currentPixels = currentFrame.data;
+        const previousPixels = previousFrameData.data;
+        const width = currentFrame.width;
+        const totalPixels = currentPixels.length / 4;
+        const tolerance = 65 - Number(motionSensitivity.value);
+        let changedPixels = 0;
+        let minX = width;
+        let minY = currentFrame.height;
+        let maxX = -1;
+        let maxY = -1;
+
+        for (let i = 0; i < currentPixels.length; i += 4) {
+            const difference = Math.abs(currentPixels[i] - previousPixels[i]);
+            if (difference <= tolerance) continue;
+
+            const pixelIndex = i / 4;
+            const x = pixelIndex % width;
+            const y = Math.floor(pixelIndex / width);
+            const hasChangedNeighbor = x + 1 < width &&
+                Math.abs(currentPixels[i + 4] - previousPixels[i + 4]) > tolerance;
+            if (!hasChangedNeighbor) continue;
+
+            changedPixels++;
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x + 1);
+            maxY = Math.max(maxY, y);
+        }
+
+        if (changedPixels <= totalPixels * 0.02 || maxX < 0) return null;
+        return { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
+    }
+
+    function analyzeMotionFrame() {
+        if (!cameraStream) return;
+        if (motionVideo.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+            motionAnimationId = requestAnimationFrame(analyzeMotionFrame);
+            return;
+        }
+
+        motionContext.drawImage(motionVideo, 0, 0, motionCanvas.width, motionCanvas.height);
+        const currentFrame = motionContext.getImageData(0, 0, motionCanvas.width, motionCanvas.height);
+        convertFrameToGrayscale(currentFrame);
+
+        const cleanFrame = new ImageData(
+            new Uint8ClampedArray(currentFrame.data),
+            currentFrame.width,
+            currentFrame.height
+        );
+        const bounds = previousFrame ? compareFrames(currentFrame, previousFrame) : null;
+        motionContext.putImageData(currentFrame, 0, 0);
+
+        if (bounds) {
+            motionContext.strokeStyle = '#ff2929';
+            motionContext.lineWidth = Math.max(3, motionCanvas.width / 320);
+            motionContext.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        }
+        motionIndicator.hidden = !bounds;
+        previousFrame = cleanFrame;
+        motionAnimationId = requestAnimationFrame(analyzeMotionFrame);
+    }
+
+    motionSensitivity.addEventListener('input', () => {
+        if (motionSensitivityValue) motionSensitivityValue.value = motionSensitivity.value;
+    });
+
+    motionStartButton.addEventListener('click', async () => {
+        stopMotionDetection('Solicitando acceso a la cámara…');
+        const requestId = cameraRequestId;
+        motionStartButton.disabled = true;
+        motionStopButton.disabled = false;
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            stopMotionDetection('Este navegador no permite acceder a la cámara. Usa un contexto HTTPS o localhost.');
+            return;
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            if (requestId !== cameraRequestId) {
+                stream.getTracks().forEach(track => track.stop());
+                return;
+            }
+
+            cameraStream = stream;
+            stream.getTracks().forEach(track => {
+                track.addEventListener('ended', () => {
+                    if (cameraStream === stream) stopMotionDetection('La cámara se desconectó.');
+                }, { once: true });
+            });
+            motionVideo.srcObject = stream;
+            await motionVideo.play();
+            if (requestId !== cameraRequestId) return;
+            if (!motionVideo.videoWidth || !motionVideo.videoHeight) {
+                throw new Error('La cámara no entregó un fotograma válido.');
+            }
+
+            motionCanvas.width = motionVideo.videoWidth;
+            motionCanvas.height = motionVideo.videoHeight;
+            setMotionStatus('Cámara activa. Mueve algo frente a ella para detectar movimiento.');
+            motionAnimationId = requestAnimationFrame(analyzeMotionFrame);
+        } catch (error) {
+            if (requestId !== cameraRequestId) return;
+            stopMotionDetection(`No se pudo iniciar la cámara: ${error.message}`);
+            console.error('Error al iniciar el detector de movimiento:', error);
+        }
+    });
+
+    motionStopButton.addEventListener('click', () => stopMotionDetection());
+    motionVideo.addEventListener('error', () => {
+        if (cameraStream) stopMotionDetection('La reproducción de la cámara falló.');
+    });
+}
+
 document.querySelectorAll('.multi-exp-canvas').forEach(canvas => {
     const ctx = canvas.getContext('2d');
     const type = canvas.dataset.type;

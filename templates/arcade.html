@@ -13,7 +13,7 @@ séptimo juego; basta con agregarlo en el diccionario `GAMES` de `app.py`.
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Arcade — 6 Cartuchos Instalables Sin Anuncios</title>
+    <title>Arcade</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -26,7 +26,6 @@ séptimo juego; basta con agregarlo en el diccionario `GAMES` de `app.py`.
             <a href="/" class="mode-pill" style="text-decoration:none;">← Volver al Portafolio</a>
             <button class="mode-pill" id="theme-toggle">Tema</button>
         </div>
-        <span>COLECCIÓN SIN ANUNCIOS</span>
     </header>
 
     <main class="works-section">
@@ -39,8 +38,8 @@ séptimo juego; basta con agregarlo en el diccionario `GAMES` de `app.py`.
             CATÁLOGO <span class="italic-accent">ARCADE</span>.
         </h1>
         <p class="hero-bio" style="max-width: 680px; margin-bottom: 3.5rem;">
-            Cada juego cuenta con su propio contenedor, ícono vectorial y manifiesto aislado. Entra al cartucho que prefieras para jugarlo a pantalla completa o instalarlo como aplicación independiente en tu teléfono o computadora.
-        </p>
+            La coleccion de cartuchos son un conjunto de aplicaciones web progresivas (PWA) que funcionan sin anuncios, sin rastreadores y sin dependencias externas. Cada cartucho es un proyecto independiente que puede ser instalado en tu dispositivo y ejecutado offline.
+    </p>
 
         <div class="arcade-hub-grid">
             {% for game_id, game in games.items() %}

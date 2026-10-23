@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laboratorio de Experimentos — Leonardo Viscaya</title>
+    <title>Laboratorio de Experimentos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -17,24 +17,23 @@
             <button class="mode-pill active" data-target="#exp-01">01. Gravedad</button>
             <button class="mode-pill" data-target="#exp-02">02. Ondas</button>
             <button class="mode-pill" data-target="#exp-03">03. Campo Magnético</button>
+            <button class="mode-pill" data-target="#exp-04">04. Movimiento</button>
             <button class="mode-pill" id="theme-toggle">Tema</button>
         </nav>
-        <span>SANDBOX FÍSICO & VISUAL</span>
+        <span>SANDBOX FÍSICO</span>
     </header>
 
     <main>
         <!-- ENCABEZADO DEL LABORATORIO -->
         <section class="works-section">
             <div class="section-header">
-                <span>COLECCIÓN DE SIMULACIONES INTERACTIVAS</span>
+                <span>COLECCIÓN DE SIMULACIONES</span>
                 <span>SCROLL PARA PROBAR CADA EXPERIMENTO ↓</span>
             </div>
             <h1 class="display-title" style="font-size: clamp(2.2rem, 4.8vw, 4.6rem); margin: 2rem 0 1rem;">
                 MINI <span class="italic-accent">EXPERIMENTOS</span>.
             </h1>
-            <p class="hero-bio" style="max-width: 660px;">
-                Archivo de simulaciones matemáticas, sistemas dinámicos y visualizaciones interactivas en HTML5 Canvas. Usa el menú superior o desplázate hacia abajo para interactuar con cada modelo.
-            </p>
+
         </section>
 
         <!-- EXPERIMENTO 01: GRAVITACIÓN -->
@@ -99,6 +98,36 @@
                 </div>
                 <div class="experiment-canvas-box">
                     <canvas id="canvas-field" class="multi-exp-canvas" data-type="field"></canvas>
+                </div>
+            </div>
+        </section>
+        <!-- EXPERIMENTO 04: Detector de Movimiento -->
+        <section class="experiments-section" id="exp-04">
+            <div class="section-header">
+                <span>EXPERIMENTO 04 // VISIÓN POR COMPUTADORA</span>
+                <span>DETECTOR DE MOVIMIENTO</span>
+            </div>
+            <div class="experiment-wrapper">
+                <div class="experiment-sidebar">
+                    <span class="pill-tag">Análisis de imagen</span>
+                    <h2>Detector de Movimiento</h2>
+                    <p>Compara fotogramas de la cámara para detectar movimiento y marcar las zonas activas. La cámara solo se activa cuando pulsas “Iniciar detección”.</p>
+                    <div class="exp-controls">
+                        <label for="motion-sensitivity">Sensibilidad: <output id="motion-sensitivity-value" for="motion-sensitivity">22</output></label>
+                        <input type="range" class="lab-slider" id="motion-sensitivity" min="10" max="40" value="22">
+                    </div>
+                    <div class="motion-detector-controls">
+                        <button class="btn-editorial" id="motion-start" type="button">Iniciar detección</button>
+                        <button class="btn-editorial btn-outline" id="motion-stop" type="button" disabled>Detener</button>
+                    </div>
+                    <p class="motion-detector-status" id="motion-status" role="status" aria-live="polite">La cámara está apagada.</p>
+                </div>
+                <div class="experiment-canvas-box motion-detector-box">
+                    <div class="motion-detector-stage">
+                        <video id="motion-video" autoplay muted playsinline aria-label="Vista previa de la cámara"></video>
+                        <canvas id="motion-canvas" aria-label="Fotograma analizado para detectar movimiento"></canvas>
+                        <p class="motion-indicator" id="motion-indicator" hidden>¡Movimiento detectado!</p>
+                    </div>
                 </div>
             </div>
         </section>
