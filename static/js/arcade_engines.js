@@ -124,74 +124,199 @@ function attachTouchSwipe(element, callbacks) {
 }
 
 /* ============================================================================
-   CARTUCHO 01: BUSCAMINAS PRO (6 MODOS + PERSONALIZADO + ONDA EXPANSIVA)
+   CARTUCHO 01: BUSCAMINAS MINIMALISTA CON CÁMARA PAN/ZOOM Y SELECTOR DE NIVEL
    ============================================================================ */
 if (activeGame === 'buscaminas') {
-    const boardEl = document.getElementById('minesweeper-board');
-    const presetSelect = document.getElementById('mine-preset-select');
+    const menuView = document.getElementById('mines-menu-view');
+    const playView = document.getElementById('mines-play-view');
+    const levelNameEl = document.getElementById('level-name-display');
+    const levelSpecsEl = document.getElementById('level-specs-sub');
     const customBar = document.getElementById('custom-mine-bar');
-    const applyCustomBtn = document.getElementById('apply-custom-mines');
+    const startBtn = document.getElementById('start-clean-game-btn');
+    const backMenuBtn = document.getElementById('back-to-menu-btn');
+    const overlayMenuBtn = document.getElementById('overlay-menu-btn');
+    const themePlayBtn = document.getElementById('theme-toggle-play');
+
+    const viewport = document.getElementById('mines-viewport');
+    const cameraRig = document.getElementById('mines-camera-rig');
+    const boardEl = document.getElementById('minesweeper-board');
+    const tapCover = document.getElementById('tap-to-start-cover');
+    const resetZoomBtn = document.getElementById('reset-zoom-btn');
+    const timerEl = document.getElementById('mines-timer');
+
     const modeBtn = document.getElementById('mode-toggle');
-    const modeIcon = document.getElementById('mode-icon');
-    const modeLabel = document.getElementById('mode-label');
+    const pillMine = document.getElementById('pill-opt-mine');
+    const pillFlag = document.getElementById('pill-opt-flag');
 
-    const SVG_FLAG_PRO = `<svg viewBox="0 0 24 24" fill="none"><path d="M5 21V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M5 4L19 9L5 14V4Z" fill="#588157" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
-    const SVG_PICK_PRO = `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>`;
-    const SVG_MINE_PRO = `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5.5" fill="currentColor"/><path d="M12 3V21M3 12H21M5.6 5.6L18.4 18.4M18.4 5.6L5.6 18.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+    const LEVELS = [
+        { name: 'Principiante', cols: 8,  rows: 12, mines: 14 },
+        { name: 'Fácil',        cols: 9,  rows: 15, mines: 22 },
+        { name: 'Mediano',      cols: 11, rows: 19, mines: 38 },
+        { name: 'Difícil',      cols: 13, rows: 23, mines: 65 },
+        { name: 'Extrema',      cols: 16, rows: 30, mines: 150 },
+        { name: 'Personalizado', custom: true }
+    ];
+    let currentLevelIdx = 2;
 
-    let COLS = 8, ROWS = 8, MINES_COUNT = 10;
-    let flagMode = false, firstClick = true, gameOver = false;
+    const SVG_FLAG_CLEAN = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M6 21V4M6 4l13 5-13 5V4z" fill="var(--bg-primary)" stroke="var(--bg-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const SVG_MINE_CLEAN = `<svg viewBox="0 0 100 100" width="22" height="22"><path d="M42 6h16v14H42zM42 80h16v14H42zM6 42h14v16H6zM80 42h14v16H80zM16 23l10-10 11 11-10 10zM63 70l10-10 11 11-10 10zM74 13l10 10-11 11-10-10zM27 60l10 10-11 11-10-10z" fill="currentColor"/><circle cx="50" cy="50" r="34" fill="currentColor"/><rect x="42" y="42" width="16" height="16" rx="3" fill="var(--bg-primary)"/></svg>`;
+
+    let COLS = 11, ROWS = 19, MINES_COUNT = 38;
+    let flagMode = false;
+    let firstClick = true, gameOver = false;
     let mines = new Set(), cells = [], counts = [];
     let explosionTimers = [];
+    let secondsElapsed = 0, timerInterval = null;
 
-    if (hudLabelEl) hudLabelEl.textContent = 'MINAS RESTANTES';
+    let camX = 0, camY = 0, camScale = 1;
+    let isPanning = false, didMoveCamera = false;
+
+    function updateCarouselUI() {
+        const lvl = LEVELS[currentLevelIdx];
+        levelNameEl.textContent = lvl.name;
+        if (lvl.custom) {
+            customBar.hidden = false;
+            levelSpecsEl.textContent = 'Configura las dimensiones a tu gusto';
+        } else {
+            customBar.hidden = true;
+            levelSpecsEl.textContent = `${lvl.cols} × ${lvl.rows} · ${lvl.mines} Minas`;
+        }
+    }
+
+    document.getElementById('prev-level-btn').addEventListener('click', () => {
+        currentLevelIdx = (currentLevelIdx - 1 + LEVELS.length) % LEVELS.length;
+        updateCarouselUI();
+    });
+
+    document.getElementById('next-level-btn').addEventListener('click', () => {
+        currentLevelIdx = (currentLevelIdx + 1) % LEVELS.length;
+        updateCarouselUI();
+    });
+
+    if (themePlayBtn) {
+        themePlayBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            html.dataset.mode = html.dataset.mode === 'light' ? 'dark' : 'light';
+        });
+    }
+
+    function updatePillUI() {
+        pillMine.classList.toggle('active', !flagMode);
+        pillFlag.classList.toggle('active', flagMode);
+    }
+    updatePillUI();
+
+    modeBtn.addEventListener('click', () => {
+        flagMode = !flagMode;
+        updatePillUI();
+        if (navigator.vibrate) navigator.vibrate(15);
+    });
+
+    function startTimer() {
+        stopTimer();
+        secondsElapsed = 0;
+        timerEl.textContent = '0S';
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            timerEl.textContent = `${secondsElapsed}S`;
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
 
     function updateFlagCounter() {
         const placed = cells.filter(c => c.classList.contains('flagged')).length;
         if (hudCurrentEl) hudCurrentEl.textContent = Math.max(0, MINES_COUNT - placed);
     }
 
-    function updateModeUI() {
-        if (!modeBtn) return;
-        if (modeIcon) modeIcon.innerHTML = flagMode ? SVG_FLAG_PRO : SVG_PICK_PRO;
-        if (modeLabel) modeLabel.textContent = flagMode ? 'Bandera' : 'Cavar';
-        modeBtn.classList.toggle('active', !flagMode);
+    function applyCameraTransform() {
+        cameraRig.style.transform = `translate3d(${camX}px, ${camY}px, 0) scale(${camScale})`;
     }
 
-    if (modeBtn) {
-        updateModeUI();
-        modeBtn.addEventListener('click', () => {
-            flagMode = !flagMode;
-            updateModeUI();
+    function fitBoardToViewport() {
+        const vw = viewport.clientWidth - 28;
+        const vh = viewport.clientHeight - 28;
+        const bw = COLS * 38;
+        const bh = ROWS * 38;
+        const fitScale = Math.min(vw / bw, vh / bh, 1.15);
+        camScale = Math.max(fitScale, 0.72);
+        camX = 0;
+        camY = 0;
+        applyCameraTransform();
+    }
+
+    resetZoomBtn.addEventListener('click', fitBoardToViewport);
+
+    (function setupViewportCamera() {
+        let startX = 0, startY = 0, initialCamX = 0, initialCamY = 0;
+        let initialPinchDist = null, initialScale = 1;
+
+        viewport.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('.game-overlay')) return;
+            isPanning = true;
+            didMoveCamera = false;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialCamX = camX;
+            initialCamY = camY;
         });
-    }
 
-    if (presetSelect) {
-        presetSelect.addEventListener('change', () => {
-            if (presetSelect.value === 'custom') {
-                customBar.hidden = false;
-                return;
+        window.addEventListener('pointermove', (e) => {
+            if (!isPanning) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            if (Math.hypot(dx, dy) > 9) {
+                didMoveCamera = true;
+                camX = initialCamX + dx;
+                camY = initialCamY + dy;
+                applyCameraTransform();
             }
-            customBar.hidden = true;
-            const [c, r, m] = presetSelect.value.split(',').map(Number);
-            COLS = c; ROWS = r; MINES_COUNT = m;
-            initProMinesweeper();
         });
-    }
 
-    if (applyCustomBtn) {
-        applyCustomBtn.addEventListener('click', () => {
-            const c = Math.max(5, Math.min(24, parseInt(document.getElementById('custom-cols').value, 10) || 10));
-            const r = Math.max(5, Math.min(20, parseInt(document.getElementById('custom-rows').value, 10) || 10));
-            const maxMines = Math.max(1, (c * r) - 9);
-            const m = Math.max(1, Math.min(maxMines, parseInt(document.getElementById('custom-mines').value, 10) || 15));
-            document.getElementById('custom-cols').value = c;
-            document.getElementById('custom-rows').value = r;
-            document.getElementById('custom-mines').value = m;
-            COLS = c; ROWS = r; MINES_COUNT = m;
-            initProMinesweeper();
+        window.addEventListener('pointerup', () => {
+            isPanning = false;
         });
-    }
+
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                isPanning = false;
+                didMoveCamera = true;
+                initialPinchDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = camScale;
+            }
+        }, { passive: true });
+
+        viewport.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialPinchDist) {
+                e.preventDefault();
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                camScale = Math.min(2.2, Math.max(0.45, initialScale * (dist / initialPinchDist)));
+                applyCameraTransform();
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchend', () => {
+            initialPinchDist = null;
+        });
+
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY < 0 ? 1.1 : 0.9;
+            camScale = Math.min(2.2, Math.max(0.45, camScale * delta));
+            applyCameraTransform();
+        }, { passive: false });
+    })();
 
     function getNeighbors(idx) {
         const r = Math.floor(idx / COLS), c = idx % COLS;
@@ -208,8 +333,42 @@ if (activeGame === 'buscaminas') {
         return list;
     }
 
+    function launchGameFromMenu() {
+        const lvl = LEVELS[currentLevelIdx];
+        if (lvl.custom) {
+            COLS = Math.max(6, Math.min(30, parseInt(document.getElementById('custom-cols').value, 10) || 12));
+            ROWS = Math.max(6, Math.min(40, parseInt(document.getElementById('custom-rows').value, 10) || 20));
+            const maxM = Math.max(1, COLS * ROWS - 9);
+            MINES_COUNT = Math.max(1, Math.min(maxM, parseInt(document.getElementById('custom-mines').value, 10) || 40));
+        } else {
+            COLS = lvl.cols;
+            ROWS = lvl.rows;
+            MINES_COUNT = lvl.mines;
+        }
+        menuView.hidden = true;
+        playView.hidden = false;
+        initProMinesweeper();
+    }
+
+    startBtn.addEventListener('click', launchGameFromMenu);
+    backMenuBtn.addEventListener('click', () => {
+        stopTimer();
+        playView.hidden = true;
+        menuView.hidden = false;
+    });
+    if (overlayMenuBtn) {
+        overlayMenuBtn.addEventListener('click', () => {
+            hideGameOverlay();
+            stopTimer();
+            playView.hidden = true;
+            menuView.hidden = false;
+        });
+    }
+
     function initProMinesweeper() {
         hideGameOverlay();
+        stopTimer();
+        timerEl.textContent = '0S';
         explosionTimers.forEach(t => clearTimeout(t));
         explosionTimers = [];
 
@@ -219,26 +378,29 @@ if (activeGame === 'buscaminas') {
         counts = new Array(COLS * ROWS).fill(0);
         firstClick = true;
         gameOver = false;
+        tapCover.hidden = false;
+        flagMode = false;
+        updatePillUI();
 
-        // Ajustar tamaño de casilla automáticamente según el ancho del tablero
-        const cellSize = COLS >= 16 ? 'clamp(24px, 4.8vw, 34px)'
-                       : COLS >= 12 ? 'clamp(28px, 6.5vw, 40px)'
-                       : 'clamp(36px, 9.2vw, 50px)';
-        boardEl.style.gridTemplateColumns = `repeat(${COLS}, ${cellSize})`;
+        boardEl.style.gridTemplateColumns = `repeat(${COLS}, 38px)`;
 
         for (let i = 0; i < COLS * ROWS; i++) {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'mine-cell';
-            btn.addEventListener('click', () => onCellClick(i));
+            btn.className = 'mine-cell clean-cell';
+            btn.addEventListener('click', () => {
+                if (didMoveCamera) return;
+                onCellClick(i);
+            });
             btn.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                toggleFlag(i);
+                if (!didMoveCamera) toggleFlag(i);
             });
             boardEl.appendChild(btn);
             cells.push(btn);
         }
         updateFlagCounter();
+        requestAnimationFrame(fitBoardToViewport);
     }
 
     function placeMines(safeIndex) {
@@ -253,18 +415,37 @@ if (activeGame === 'buscaminas') {
     }
 
     function toggleFlag(idx) {
+        if (firstClick) {
+            onFirstOpen(idx);
+            return;
+        }
         const cell = cells[idx];
         if (gameOver || cell.classList.contains('revealed')) return;
         const isFlagged = cell.classList.toggle('flagged');
-        cell.innerHTML = isFlagged ? SVG_FLAG_PRO : '';
+        cell.innerHTML = isFlagged ? SVG_FLAG_CLEAN : '';
         updateFlagCounter();
+    }
+
+    function onFirstOpen(idx) {
+        tapCover.hidden = true;
+        placeMines(idx);
+        firstClick = false;
+        startTimer();
+        flagMode = true;
+        updatePillUI();
+        triggerReveal(idx);
+        checkWin();
     }
 
     function onCellClick(idx) {
         if (gameOver) return;
+        if (firstClick) {
+            onFirstOpen(idx);
+            return;
+        }
+
         const cell = cells[idx];
 
-        // Chording: Despejar vecinas al tocar un número que ya tiene sus banderas completas
         if (cell.classList.contains('revealed')) {
             const needed = counts[idx];
             if (needed > 0) {
@@ -288,60 +469,47 @@ if (activeGame === 'buscaminas') {
         }
         if (cell.classList.contains('flagged')) return;
 
-        if (firstClick) {
-            placeMines(idx);
-            firstClick = false;
-        }
-
         triggerReveal(idx);
         checkWin();
     }
 
-    // Animación de Onda Expansiva Radial cuando pierdes
     function triggerRadialExplosion(epicenterIdx) {
         gameOver = true;
+        stopTimer();
         const epiR = Math.floor(epicenterIdx / COLS);
         const epiC = epicenterIdx % COLS;
 
-        // 1. Estallar el epicentro inmediatamente
-        cells[epicenterIdx].innerHTML = SVG_MINE_PRO;
+        cells[epicenterIdx].innerHTML = SVG_MINE_CLEAN;
         cells[epicenterIdx].classList.add('boom', 'boom-epicenter');
 
-        // 2. Propagar onda de choque visual por todas las casillas según su distancia radial
         cells.forEach((cell, idx) => {
             const r = Math.floor(idx / COLS), c = idx % COLS;
             const dist = Math.hypot(r - epiR, c - epiC);
-            const waveDelay = Math.round(dist * 55);
-
-            const tWave = setTimeout(() => {
-                cell.classList.add('shockwave-pulse');
-            }, waveDelay);
+            const tWave = setTimeout(() => cell.classList.add('shockwave-pulse'), Math.round(dist * 45));
             explosionTimers.push(tWave);
         });
 
-        // 3. Hacer estallar cada mina en cadena conforme la onda la alcanza
         let maxDelay = 0;
         mines.forEach(mIdx => {
             if (mIdx === epicenterIdx) return;
             const r = Math.floor(mIdx / COLS), c = mIdx % COLS;
             const dist = Math.hypot(r - epiR, c - epiC);
-            const delay = Math.round(dist * 75) + Math.floor(Math.random() * 45);
+            const delay = Math.round(dist * 65) + Math.floor(Math.random() * 35);
             if (delay > maxDelay) maxDelay = delay;
 
             const tMine = setTimeout(() => {
                 const mCell = cells[mIdx];
                 mCell.classList.remove('flagged');
-                mCell.innerHTML = SVG_MINE_PRO;
+                mCell.innerHTML = SVG_MINE_CLEAN;
                 mCell.classList.add('boom', 'boom-chain');
-                if (navigator.vibrate) navigator.vibrate(18);
+                if (navigator.vibrate) navigator.vibrate(15);
             }, delay);
             explosionTimers.push(tMine);
         });
 
-        // 4. Mostrar el modal de fin de partida cuando termine la cadena de explosiones
         const tModal = setTimeout(() => {
-            showGameOverlay('Reacción en Cadena', '¡Mina Detonada!', 'Todas las minas del campo estallaron desde el punto de impacto.');
-        }, maxDelay + 650);
+            showGameOverlay('Mina Detonada', `Tiempo: ${secondsElapsed}S`, 'Reacción en cadena completada.');
+        }, maxDelay + 600);
         explosionTimers.push(tModal);
     }
 
@@ -372,13 +540,14 @@ if (activeGame === 'buscaminas') {
         const revealedCount = cells.filter(c => c.classList.contains('revealed')).length;
         if (revealedCount === COLS * ROWS - MINES_COUNT) {
             gameOver = true;
+            stopTimer();
             syncScoreWithServer(bestScore + 1);
-            showGameOverlay('Campo Despejado', '¡Victoria Limpia!', `Desactivaste las ${MINES_COUNT} minas sin un solo error.`);
+            showGameOverlay('Campo Despejado', `¡Victoria en ${secondsElapsed}S!`, `Desactivaste las ${MINES_COUNT} minas.`);
         }
     }
 
+    updateCarouselUI();
     currentResetCallback = initProMinesweeper;
-    initProMinesweeper();
 }
 /* ============================================================================
    CARTUCHO 02: SUDOKU CON SELECTOR NUMÉRICO FLOTANTE (POPOVER)

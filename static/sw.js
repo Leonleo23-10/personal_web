@@ -1,4 +1,4 @@
-const CACHE_NAME = 'leolab-general-v5';
+const CACHE_NAME = 'leolab-general-v6';
 const URLS = [
     '/',
     '/arcade',

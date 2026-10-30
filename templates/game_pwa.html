@@ -1,15 +1,4 @@
 <!DOCTYPE html>
-<!--
-================================================================================
-VISTA INDIVIDUAL DE JUEGO CENTRADA (CENTER-STAGE): templates/game_pwa.html
-================================================================================
-DISEÑO:
-- Barra superior compacta (.game-hud-bar) con controles esenciales y récords SQL.
-- Área de juego centrada (.game-stage-area) sin botones direccionales estorbando.
-- Modal superpuesto (#game-overlay) que emerge sobre el tablero al ganar/perder.
-- Popover flotante (#sudoku-popover) que aparece sobre la celda tocada en Sudoku.
-================================================================================
--->
 <html lang="es" data-mode="light">
 <head>
     <meta charset="UTF-8">
@@ -19,11 +8,128 @@ DISEÑO:
     <link rel="icon" type="image/svg+xml" href="/arcade/{{ game_id }}/icon.svg">
     <meta name="theme-color" content="#344e41">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body data-game-scope="/arcade/{{ game_id }}/" data-active-game="{{ game_id }}" class="arcade-fullscreen-body">
 
+    {% if game_id == 'buscaminas' %}
+    <div class="clean-mines-app" id="clean-mines-app">
+
+        <!-- VISTA 1: MENÚ DE SELECCIÓN DE NIVEL -->
+        <section class="mines-menu-view" id="mines-menu-view">
+            <header class="mines-Clean-header">
+                <a href="/arcade" class="clean-icon-btn" title="Volver al Arcade">←</a>
+                <div></div>
+                <button id="theme-toggle" class="clean-icon-btn" title="Cambiar Tema">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3 0 5.6-2.5 5.6-5.6C23 5.4 18 2 12 2zm-5.5 9A1.5 1.5 0 1 1 8 9.5 1.5 1.5 0 0 1 6.5 11zm3-4A1.5 1.5 0 1 1 11 5.5 1.5 1.5 0 0 1 9.5 7zm5 0A1.5 1.5 0 1 1 16 5.5 1.5 1.5 0 0 1 14.5 7zm3 4a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 17.5 11z"/>
+                    </svg>
+                </button>
+            </header>
+
+            <div class="mines-menu-center">
+                <div class="big-gear-mine">
+                    <svg viewBox="0 0 100 100" width="160" height="160">
+                        <path d="M43 8h14v10h-14zM43 82h14v10h-14zM8 43h10v14H8zM82 43h10v14H82zM17 24l7-7 8 8-7 7zM68 75l7-7 8 8-7 7zM75 17l7 7-8 8-7-7zM24 68l7 7-8 8-7-7z" fill="#588157"/>
+                        <circle cx="50" cy="50" r="34" fill="#588157"/>
+                        <rect x="42" y="42" width="16" height="16" rx="3" fill="var(--bg-primary)"/>
+                    </svg>
+                </div>
+
+                <div class="level-carousel">
+                    <button type="button" class="carousel-arrow" id="prev-level-btn">‹</button>
+                    <span class="level-name-display" id="level-name-display">Mediano</span>
+                    <button type="button" class="carousel-arrow" id="next-level-btn">›</button>
+                </div>
+                <p class="level-specs-sub" id="level-specs-sub">11 × 19 · 38 Minas</p>
+
+                <div class="custom-mine-bar" id="custom-mine-bar" hidden style="max-width:320px; margin-bottom: 1rem;">
+                    <label>Ancho <input type="number" id="custom-cols" min="6" max="30" value="12"></label>
+                    <label>Alto <input type="number" id="custom-rows" min="6" max="40" value="20"></label>
+                    <label>Minas <input type="number" id="custom-mines" min="1" max="300" value="45"></label>
+                </div>
+
+                <button type="button" class="clean-start-btn" id="start-clean-game-btn">Nuevo juego</button>
+            </div>
+
+            <footer class="mines-menu-footer">
+                <div class="stat-pill">
+                    <span class="stat-label">VICTORIAS GUARDADAS</span>
+                    <strong id="hud-best-val">0</strong>
+                </div>
+                <button id="pwa-install-btn" class="clean-install-link">Instalar App Offline</button>
+            </footer>
+        </section>
+
+        <!-- VISTA 2: PANTALLA DE JUEGO CON ZOOM Y DESLIZAMIENTO -->
+        <section class="mines-play-view" id="mines-play-view" hidden>
+            <header class="mines-Clean-header">
+                <button type="button" class="clean-icon-btn" id="back-to-menu-btn" title="Cambiar Dificultad">←</button>
+                
+                <div class="clean-top-stats">
+                    <div class="clean-mine-count">
+                        <svg viewBox="0 0 100 100" width="20" height="20">
+                            <path d="M42 6h16v14H42zM42 80h16v14H42zM6 42h14v16H6zM80 42h14v16H80zM16 23l10-10 11 11-10 10zM63 70l10-10 11 11-10 10zM74 13l10 10-11 11-10-10zM27 60l10 10-11 11-10-10z" fill="currentColor"/>
+                            <circle cx="50" cy="50" r="34" fill="currentColor"/>
+                            <rect x="42" y="42" width="16" height="16" rx="3" fill="var(--bg-primary)"/>
+                        </svg>
+                        <span id="hud-current-val">38</span>
+                    </div>
+                    <div class="clean-timer" id="mines-timer">0S</div>
+                </div>
+
+                <div style="display:flex; gap:0.4rem;">
+                    <button type="button" class="clean-icon-btn" id="reset-zoom-btn" title="Centrar Mapa">⌖</button>
+                    <button type="button" class="clean-icon-btn" id="theme-toggle-play" title="Tema">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3 0 5.6-2.5 5.6-5.6C23 5.4 18 2 12 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="mines-viewport" id="mines-viewport">
+                <div class="mines-camera-rig" id="mines-camera-rig">
+                    <div class="minesweeper-board clean-board-style" id="minesweeper-board"></div>
+                    <div class="tap-to-start-cover" id="tap-to-start-cover">
+                        <span>Toque para comenzar.</span>
+                    </div>
+                </div>
+
+                <div class="game-overlay" id="game-overlay" hidden>
+                    <div class="overlay-card">
+                        <span class="pill-tag" id="overlay-badge">Partida Terminada</span>
+                        <h2 id="overlay-title">Resultado</h2>
+                        <p id="overlay-message">Has completado la ronda.</p>
+                        <div style="display:flex; gap:0.6rem; flex-wrap:wrap; justify-content:center;">
+                            <button id="overlay-restart-btn" class="btn-editorial active">Jugar de Nuevo</button>
+                            <button id="overlay-menu-btn" class="btn-editorial">Nivel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clean-bottom-bar">
+                <div class="clean-mode-pill" id="mode-toggle">
+                    <div class="clean-pill-option" id="pill-opt-mine">
+                        <svg viewBox="0 0 100 100" width="24" height="24">
+                            <path d="M42 6h16v14H42zM42 80h16v14H42zM6 42h14v16H6zM80 42h14v16H80zM16 23l10-10 11 11-10 10zM63 70l10-10 11 11-10 10zM74 13l10 10-11 11-10-10zM27 60l10 10-11 11-10-10z" fill="currentColor"/>
+                            <circle cx="50" cy="50" r="34" fill="currentColor"/>
+                            <rect x="42" y="42" width="16" height="16" rx="3" fill="var(--bg-primary)"/>
+                        </svg>
+                    </div>
+                    <div class="clean-pill-option active" id="pill-opt-flag">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+                            <path d="M6 21V4M6 4l13 5-13 5V4z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    {% else %}
     <header class="nav-header compact-nav">
         <a href="/arcade" class="brand">← {{ game.short_name }}<span class="dot">.</span></a>
         <div class="hud-Right">
@@ -33,7 +139,6 @@ DISEÑO:
     </header>
 
     <main class="game-center-container">
-       <!-- BARRA DE ESTADO Y ACCIONES RÁPIDAS ENCIMA DEL TABLERO -->
         <div class="game-hud-bar">
             <div class="hud-stats">
                 <div class="stat-pill">
@@ -47,20 +152,7 @@ DISEÑO:
             </div>
 
             <div class="hud-controls">
-                {% if game_id == 'buscaminas' %}
-                <select id="mine-preset-select" class="btn-editorial select-editorial">
-                    <option value="8,8,10">Principiante (8×8 · 10)</option>
-                    <option value="9,9,12">Fácil (9×9 · 12)</option>
-                    <option value="12,12,24">Mediano (12×12 · 24)</option>
-                    <option value="16,16,40">Difícil (16×16 · 40)</option>
-                    <option value="20,16,68">Enorme (20×16 · 68)</option>
-                    <option value="custom">Personalizado...</option>
-                </select>
-                <button id="mode-toggle" class="btn-editorial active">
-                    <span class="btn-icon-svg" id="mode-icon"></span>
-                    <span id="mode-label">Cavar</span>
-                </button>
-                {% elif game_id == 'sudoku' %}
+                {% if game_id == 'sudoku' %}
                 <button id="sudoku-check" class="btn-editorial">Verificar</button>
                 {% elif game_id == '2048' %}
                 <button id="toggle-2048-anim" class="btn-editorial">Animación: OFF</button>
@@ -69,44 +161,24 @@ DISEÑO:
             </div>
         </div>
 
-        {% if game_id == 'buscaminas' %}
-        <!-- Barra desplegable para el modo Personalizado de Buscaminas -->
-        <div class="custom-mine-bar" id="custom-mine-bar" hidden>
-            <label>Columnas <input type="number" id="custom-cols" min="5" max="24" value="14"></label>
-            <label>Filas <input type="number" id="custom-rows" min="5" max="20" value="14"></label>
-            <label>Minas <input type="number" id="custom-mines" min="1" max="200" value="30"></label>
-            <button id="apply-custom-mines" class="btn-editorial active">Crear Tablero</button>
-        </div>
-        {% endif %}
-        <!-- ESCENARIO CENTRAL DEL JUEGO (MAXIMIZADO Y CENTRADO) -->
         <div class="game-stage-wrapper">
-
-            {% if game_id == 'buscaminas' %}
-            <div class="minesweeper-board" id="minesweeper-board"></div>
-
-            {% elif game_id == 'sudoku' %}
+            {% if game_id == 'sudoku' %}
             <div class="sudoku-stage-box">
                 <div class="sudoku-board" id="sudoku-board"></div>
-                <!-- Popover flotante de selección de números (aparece al hacer clic en una celda) -->
                 <div class="sudoku-popover" id="sudoku-popover" hidden>
                     <div class="popover-grid" id="popover-numbers"></div>
                 </div>
             </div>
-
             {% elif game_id == 'solitario' %}
             <div class="solitaire-table" id="solitaire-table"></div>
-
             {% elif game_id == 'tetris' %}
             <canvas id="tetris-canvas" width="300" height="600" class="arcade-canvas"></canvas>
-
             {% elif game_id == '2048' %}
             <div class="board-2048" id="board-2048"></div>
-
             {% elif game_id == 'snake' %}
             <canvas id="snake-canvas" width="420" height="420" class="arcade-canvas"></canvas>
             {% endif %}
 
-            <!-- OVERLAY FLOTANTE DE VICTORIA / FIN DE PARTIDA (ENCIMA DEL TABLERO) -->
             <div class="game-overlay" id="game-overlay" hidden>
                 <div class="overlay-card">
                     <span class="pill-tag" id="overlay-badge">Partida Terminada</span>
@@ -115,25 +187,9 @@ DISEÑO:
                     <button id="overlay-restart-btn" class="btn-editorial active">Jugar Nuevo Tablero</button>
                 </div>
             </div>
-
         </div>
-
-        <p class="game-gesture-hint" id="gesture-hint">
-            {% if game_id == 'buscaminas' %}
-            Toca una casilla para cavar o marca banderas. Toca un número resuelto para despejar sus vecinas.
-            {% elif game_id == 'sudoku' %}
-            Toca cualquier casilla vacía para abrir el selector flotante de números o escribe con el teclado.
-            {% elif game_id == 'solitario' %}
-            Arrastra las cartas con el dedo o el ratón hacia otra columna o base, o haz doble toque para moverlas.
-            {% elif game_id == 'tetris' %}
-            Desliza a los lados para mover, toca el tablero para rotar y desliza hacia abajo para soltar la pieza.
-            {% elif game_id == '2048' %}
-            Desliza en cualquier dirección directamente sobre el tablero o usa las teclas direccionales.
-            {% elif game_id == 'snake' %}
-            Desliza sobre el tablero para cambiar de dirección o usa las teclas direccionales.
-            {% endif %}
-        </p>
     </main>
+    {% endif %}
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/arcade_engines.js') }}"></script>

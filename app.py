@@ -215,7 +215,7 @@ def game_sw(game_id):
     if game_id not in GAMES:
         abort(404)
     sw_code = f"""
-    const CACHE_NAME = 'pwa-game-{game_id}-v5';
+    const CACHE_NAME = 'pwa-game-{game_id}-v6';
     const URLS = [
         '/arcade/{game_id}/',
         '/static/css/style.css',
